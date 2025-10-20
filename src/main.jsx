@@ -1,19 +1,15 @@
+// Exemplo em src/main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import App from "./App.jsx"; // se o seu App estiver em outro caminho, ajuste
 
-import App from "./App.jsx";
+import "./index.css";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
-]);
-
-// Renderize a aplicação com o provedor de rotas
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </React.StrictMode>
 );

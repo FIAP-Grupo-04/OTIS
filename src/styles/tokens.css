@@ -1,0 +1,33 @@
+:root {
+  /* ——— Tipografia (Figma) ——— */
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* ——— Cores ——— */
+  --color-bg: #f7faff;
+  --color-surface: #ffffff;
+  --color-border: #e6ebf5;
+  --color-text: #0f172a;
+  --color-muted: #6b7280;
+
+  --color-primary: #2267f2;
+  --color-primary-ink: #1b4ed0;
+
+  --color-green: #10b981;
+  --color-orange: #f97316;
+  --color-yellow: #f59e0b;
+  --color-blue-soft: #eef4ff;
+
+  /* ——— Radius, sombra, spacing ——— */
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 22px;
+}

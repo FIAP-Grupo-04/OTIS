@@ -1,0 +1,6 @@
+{
+  "totalVendas": { "valor": 76, "delta": 20.1 },
+  "faturamento": { "valor": 1520000, "delta": 15.8 },
+  "vendasPendentes": { "valor": 5, "delta": -5.2 },
+  "valorPendente": { "valor": 138000, "delta": 8.3 }
+}

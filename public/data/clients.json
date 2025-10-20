@@ -1,0 +1,29 @@
+[
+  {
+    "id": "alpha",
+    "nome": "Construtora Alpha",
+    "cnpj": "12.345.678/0001-99",
+    "responsavel": "Ana Souza",
+    "telefone": "(11) 99999-0001",
+    "email": "ana@alpha.com",
+    "endereco": "Rua das Flores, 100 - São Paulo/SP"
+  },
+  {
+    "id": "beta",
+    "nome": "Edifício Beta",
+    "cnpj": "23.456.789/0001-88",
+    "responsavel": "Carlos Lima",
+    "telefone": "(11) 99999-0002",
+    "email": "carlos@beta.com",
+    "endereco": "Av. Paulista, 1500 - São Paulo/SP"
+  },
+  {
+    "id": "gamma",
+    "nome": "Shopping Center Gamma",
+    "cnpj": "34.567.890/0001-77",
+    "responsavel": "Fernanda Silva",
+    "telefone": "(11) 99999-0003",
+    "email": "fernanda@gamma.com",
+    "endereco": "Av. Central, 500 - Campinas/SP"
+  }
+]

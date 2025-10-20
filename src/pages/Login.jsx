@@ -1,0 +1,98 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const [users, setUsers] = useState([]);
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    fetch("/data/Users.json")
+      .then((r) => r.json())
+      .then(setUsers)
+      .catch(() => setUsers([]));
+  }, []);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setErro("");
+
+    if (!email.trim() || !senha.trim()) {
+      setErro("Preencha e-mail e senha.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const found = users.find((u) => u.email === email && u.senha === senha);
+      if (!found) {
+        setErro("Usuário não encontrado. Verifique e-mail e senha.");
+        return;
+      }
+      login(found);
+      navigate("/dashboard");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="login-bg">
+      <div className="login-card">
+        <div className="brand">
+          <h1>ElevadorPro</h1>
+          <p>Sistema de Gerenciamento de Vendas</p>
+        </div>
+
+        <form className="form" onSubmit={handleSubmit} noValidate>
+          <label className="label" htmlFor="email">
+            Email
+          </label>
+          <input
+            id="email"
+            className="input"
+            type="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+          />
+
+          <label className="label" htmlFor="senha">
+            Senha
+          </label>
+          <input
+            id="senha"
+            className="input"
+            type="password"
+            placeholder="••••••••"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            autoComplete="current-password"
+          />
+
+          {erro && (
+            <div className="error" style={{ marginTop: 6 }}>
+              {erro}
+            </div>
+          )}
+
+          <button
+            className="btn primary"
+            type="submit"
+            disabled={loading}
+            style={{ marginTop: 12 }}
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

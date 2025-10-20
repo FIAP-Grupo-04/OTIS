@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "role": "administrador",
+    "name": "Ana Souza",
+    "email": "ana@otis.com",
+    "senha": "123"
+  },
+  {
+    "id": 2,
+    "role": "funcionario",
+    "name": "Carlos Lima",
+    "email": "carlos@otis.com",
+    "senha": "123"
+  },
+  {
+    "id": 3,
+    "role": "supervisor",
+    "name": "Fernanda Silva",
+    "email": "fernanda@otis.com",
+    "senha": "123"
+  }
+]

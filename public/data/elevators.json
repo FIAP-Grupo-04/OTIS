@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ELV-0001",
+    "modelo": "Atlas Premium",
+    "clienteId": "alpha",
+    "capacidadeKg": 800,
+    "velocidadeMps": 1.5,
+    "paradas": 10,
+    "status": "Em Negociação",
+    "preco": 25000,
+    "instalacaoPrevista": "2024-11-15",
+    "serie": "AT-2024-0001"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "OP-0001",
+    "tipoId": "instalacao",
+    "status": "Aguardando Peças",
+    "prioridade": "Média",
+    "clienteId": "alpha",
+    "elevadorId": "ELV-0001",
+    "responsavelId": "t1",
+    "dataAbertura": "2024-09-01",
+    "dataLimite": "2024-11-15",
+    "descricao": "Instalação inicial do Atlas Premium."
+  },
+  {
+    "id": "OP-0002",
+    "tipoId": "manutencao",
+    "status": "Em Andamento",
+    "prioridade": "Alta",
+    "clienteId": "beta",
+    "elevadorId": "",
+    "responsavelId": "t2",
+    "dataAbertura": "2024-09-10",
+    "dataLimite": "2024-10-05",
+    "descricao": "Troca de cabos e revisão de portas."
+  }
+]

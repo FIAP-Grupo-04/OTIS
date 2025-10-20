@@ -1,0 +1,7 @@
+[
+  { "id": "atlas-premium", "nome": "Atlas Premium" },
+  { "id": "lift-standard", "nome": "Lift Standard" },
+  { "id": "heavy-duty-pro", "nome": "Heavy Duty Pro" },
+  { "id": "home-comfort", "nome": "Home Comfort" },
+  { "id": "luxury-suite", "nome": "Luxury Suite" }
+]

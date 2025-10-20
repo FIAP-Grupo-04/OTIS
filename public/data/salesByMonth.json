@@ -1,0 +1,10 @@
+{
+  "serie": [
+    { "mes": "Jan", "valor": 12 },
+    { "mes": "Fev", "valor": 8 },
+    { "mes": "Mar", "valor": 15 },
+    { "mes": "Abr", "valor": 10 },
+    { "mes": "Mai", "valor": 18 },
+    { "mes": "Jun", "valor": 13 }
+  ]
+}

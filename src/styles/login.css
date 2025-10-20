@@ -1,0 +1,66 @@
+/* Fundo e centralização */
+.login-bg {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, var(--color-bg), #fff);
+  padding: 24px;
+}
+
+/* Card do login */
+.login-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+/* Branding */
+.brand {
+  margin-bottom: 14px;
+}
+.brand h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-primary-ink);
+}
+.brand p {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+}
+
+/* Reuso das classes de forms.css para inputs/botões */
+.form {
+  display: grid;
+  gap: 8px;
+}
+
+/* Garantias visuais nos inputs do login (usa tokens e forms.css) */
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #f7f9fc;
+  transition: all 0.15s;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(34, 103, 242, 0.1);
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+}
