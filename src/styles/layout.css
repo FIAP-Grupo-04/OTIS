@@ -63,6 +63,55 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* ===== SIDEBAR - Comportamento Estável ===== */
+
+/* Largura fluida: entre 168px e 220px, conforme o espaço */
+:root {
+  --sidebar-max: 220px;
+  --sidebar-min: 168px;
+}
+.sidebar {
+  width: clamp(var(--sidebar-min), 18vw, var(--sidebar-max));
+  overflow-y: auto; /* se faltar altura, rola */
+}
+
+/* Ajustes leves de densidade quando a janela estreita */
+@media (max-width: 1100px) {
+  .sidebar-header { padding: var(--space-3); font-size: 1.1rem; }
+  .sidebar-nav    { gap: 2px; padding: 0 var(--space-2); }
+  .sidebar-nav a  { padding: 8px 10px; gap: 8px; font-size: 0.95rem; }
+  .sidebar-footer { padding: var(--space-2); font-size: 0.8rem; }
+}
+
+/* Altura baixa: rolagem interna; footer sempre visível opcional */
+@media (max-height: 700px) {
+  .sidebar { overflow-y: auto; padding-bottom: 1rem; }
+  .sidebar-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+/* >>> SUBSTITUI o bloco antigo que virava "topbar" <<< */
+@media (max-width: 900px) {
+  /* mantém layout em linha (sidebar + conteúdo) */
+  .app { flex-direction: row !important; }
+
+  /* sidebar continua lateral, só fica um pouco mais compacta */
+  .sidebar {
+    width: 180px !important;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    border-right: 1px solid var(--color-border) !important;
+    border-bottom: 0 !important;
+  }
+}
+
 /* ============ TOPBAR ============ */
 .topbar {
   background: var(--color-surface);
