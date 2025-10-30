@@ -9,6 +9,9 @@ import {
 import Section from "../components/ui/Section";
 import Field from "../components/forms/Field";
 import Select from "../components/forms/Select";
+import Input from "../components/ui/Input";
+import EditModal from "../components/ui/EditModal";
+import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
 import { dateBR } from "../utils/formatters";
 import { validateRequired } from "../utils/validators";
 
@@ -17,14 +20,14 @@ export default function Operations() {
   const [elevators, setElevators] = useState([]);
   const [types, setTypes] = useState([]);
   const [techs, setTechs] = useState([]);
+
   const [seedOps, setSeedOps] = useState([]);
-  const [localOps, setLocalOps] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("operations") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [localOps, setLocalOps] = useState(() =>
+    JSON.parse(localStorage.getItem("operations") || "[]")
+  );
+  const [deletedIds, setDeletedIds] = useState(() =>
+    JSON.parse(localStorage.getItem("operations_deleted") || "[]")
+  );
 
   const [q, setQ] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("");
@@ -42,6 +45,11 @@ export default function Operations() {
   });
   const [errors, setErrors] = useState({});
 
+  const [editOpen, setEditOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [toDelete, setToDelete] = useState(null);
+
   useEffect(() => {
     Promise.all([
       getClients(),
@@ -51,17 +59,23 @@ export default function Operations() {
       getOperationsSeed(),
     ])
       .then(([c, e, t, tech, ops]) => {
-        setClients(c);
+        setClients(c || []);
         setElevators(Array.isArray(e) ? e : []);
-        setTypes(t);
-        setTechs(tech);
+        setTypes(t || []);
+        setTechs(tech || []);
         setSeedOps(Array.isArray(ops) ? ops : []);
       })
       .catch(() => {});
   }, []);
 
   const lista = useMemo(() => {
-    const merged = [...seedOps, ...localOps];
+    const byId = new Map();
+    for (const o of seedOps) byId.set(o.id, o);
+    for (const o of localOps) byId.set(o.id, o);
+    const merged = Array.from(byId.values()).filter(
+      (o) => !deletedIds.includes(o.id)
+    );
+
     const term = q.trim().toLowerCase();
     return merged.filter((op) => {
       const okStatus = !statusFiltro || op.status === statusFiltro;
@@ -77,10 +91,12 @@ export default function Operations() {
         .toLowerCase();
       return okStatus && (!term || hay.includes(term));
     });
-  }, [seedOps, localOps, q, statusFiltro, clients, types, techs]);
+  }, [seedOps, localOps, deletedIds, q, statusFiltro, clients, types, techs]);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const setEditField = (k, v) => setEditForm((f) => ({ ...f, [k]: v }));
 
+  // CADASTRAR
   function handleSubmit(e) {
     e.preventDefault();
     const req = validateRequired(
@@ -113,25 +129,69 @@ export default function Operations() {
       descricao: "",
     });
     setErrors({});
-    alert("Operação cadastrada!");
   }
 
-  const badgeStatus = (s) =>
-    /Conclu/i.test(s)
-      ? "b-green"
-      : /Andamento/i.test(s)
-      ? "b-blue"
-      : /Aguard/i.test(s)
-      ? "b-yellow"
-      : "b-orange";
-  const badgePrior = (p) =>
-    /Alta/i.test(p) ? "b-orange" : /Média/i.test(p) ? "b-blue" : "b-green";
+  // EDITAR
+  function openEdit(item) {
+    setEditForm({ ...item });
+    setEditOpen(true);
+  }
+  function saveEdit(e) {
+    e.preventDefault();
+    const req = validateRequired(
+      [
+        "tipoId",
+        "clienteId",
+        "responsavelId",
+        "dataAbertura",
+        "dataLimite",
+        "descricao",
+      ],
+      editForm
+    );
+    if (Object.keys(req).length) {
+      alert("Preencha os campos obrigatórios.");
+      return;
+    }
+
+    const updated = { ...editForm };
+    const existsLocal = localOps.some((o) => o.id === updated.id);
+    const next = existsLocal
+      ? localOps.map((o) => (o.id === updated.id ? updated : o))
+      : [...localOps, updated];
+    setLocalOps(next);
+    localStorage.setItem("operations", JSON.stringify(next));
+    setEditOpen(false);
+  }
+
+  // EXCLUIR
+  function requestDelete(item) {
+    setToDelete(item);
+    setConfirmOpen(true);
+  }
+  function confirmDelete() {
+    const id = toDelete?.id;
+    if (!id) return;
+
+    if (localOps.some((o) => o.id === id)) {
+      const next = localOps.filter((o) => o.id !== id);
+      setLocalOps(next);
+      localStorage.setItem("operations", JSON.stringify(next));
+    } else {
+      const nextDel = [...new Set([...(deletedIds || []), id])];
+      setDeletedIds(nextDel);
+      localStorage.setItem("operations_deleted", JSON.stringify(nextDel));
+    }
+
+    setConfirmOpen(false);
+    setToDelete(null);
+  }
 
   return (
     <>
       <Section
         title="Cadastro de Operações"
-        subtitle="Registre novas instalações, manutenções e inspeções."
+        subtitle="Instalações, manutenções e inspeções."
       >
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
@@ -197,16 +257,14 @@ export default function Operations() {
               />
             </Field>
             <Field label="Abertura" error={errors.dataAbertura}>
-              <input
-                className="input"
+              <Input
                 type="date"
                 value={form.dataAbertura}
                 onChange={(e) => setField("dataAbertura", e.target.value)}
               />
             </Field>
             <Field label="Prazo" error={errors.dataLimite}>
-              <input
-                className="input"
+              <Input
                 type="date"
                 value={form.dataLimite}
                 onChange={(e) => setField("dataLimite", e.target.value)}
@@ -223,26 +281,6 @@ export default function Operations() {
           </div>
 
           <div className="actions">
-            <button
-              className="btn ghost"
-              type="reset"
-              onClick={() => {
-                setForm({
-                  tipoId: "",
-                  status: "Aberta",
-                  prioridade: "Média",
-                  clienteId: "",
-                  elevadorId: "",
-                  responsavelId: "",
-                  dataAbertura: new Date().toISOString().slice(0, 10),
-                  dataLimite: "",
-                  descricao: "",
-                });
-                setErrors({});
-              }}
-            >
-              Limpar
-            </button>
             <button className="btn primary" type="submit">
               Salvar
             </button>
@@ -250,10 +288,7 @@ export default function Operations() {
         </form>
       </Section>
 
-      <Section
-        title="Operações"
-        subtitle="Visão geral das operações (base + novas)."
-      >
+      <Section title="Operações" subtitle="Base pública + novos registros.">
         <div
           style={{
             display: "flex",
@@ -266,7 +301,7 @@ export default function Operations() {
             <input
               className="input"
               style={{ maxWidth: 280 }}
-              placeholder="Buscar por texto…"
+              placeholder="Buscar…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
@@ -290,6 +325,7 @@ export default function Operations() {
         <table className="table">
           <thead>
             <tr>
+              <th style={{ width: 70 }}>Ações</th>
               <th>Código</th>
               <th>Tipo</th>
               <th>Status</th>
@@ -304,18 +340,28 @@ export default function Operations() {
           <tbody>
             {lista.map((op) => (
               <tr key={op.id}>
+                <td>
+                  <div className="row-actions">
+                    <button
+                      className="icon-btn"
+                      title="Editar"
+                      onClick={() => openEdit(op)}
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      className="icon-btn danger"
+                      title="Excluir"
+                      onClick={() => requestDelete(op)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
                 <td>{op.id}</td>
                 <td>{types.find((t) => t.id === op.tipoId)?.nome ?? ""}</td>
-                <td>
-                  <span className={`badge ${badgeStatus(op.status)}`}>
-                    {op.status}
-                  </span>
-                </td>
-                <td>
-                  <span className={`badge ${badgePrior(op.prioridade)}`}>
-                    {op.prioridade}
-                  </span>
-                </td>
+                <td>{op.status}</td>
+                <td>{op.prioridade}</td>
                 <td>
                   {clients.find((c) => c.id === op.clienteId)?.nome ?? ""}
                 </td>
@@ -330,6 +376,102 @@ export default function Operations() {
           </tbody>
         </table>
       </Section>
+
+      {/* MODAIS */}
+      <EditModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        title={`Editar Operação — ${editForm.id || ""}`}
+        onSubmit={saveEdit}
+      >
+        <Field label="Tipo">
+          <Select
+            value={editForm.tipoId || ""}
+            onChange={(e) => setEditField("tipoId", e.target.value)}
+            options={types}
+          />
+        </Field>
+        <Field label="Status">
+          <Select
+            value={editForm.status || "Aberta"}
+            onChange={(e) => setEditField("status", e.target.value)}
+            options={[
+              { id: "Aberta", nome: "Aberta" },
+              { id: "Em Andamento", nome: "Em Andamento" },
+              { id: "Aguardando Peças", nome: "Aguardando Peças" },
+              { id: "Concluída", nome: "Concluída" },
+            ]}
+          />
+        </Field>
+        <Field label="Prioridade">
+          <Select
+            value={editForm.prioridade || "Média"}
+            onChange={(e) => setEditField("prioridade", e.target.value)}
+            options={[
+              { id: "Alta", nome: "Alta" },
+              { id: "Média", nome: "Média" },
+              { id: "Baixa", nome: "Baixa" },
+            ]}
+          />
+        </Field>
+        <Field label="Cliente">
+          <Select
+            value={editForm.clienteId || ""}
+            onChange={(e) => setEditField("clienteId", e.target.value)}
+            options={clients}
+          />
+        </Field>
+        <Field label="Elevador">
+          <select
+            className="input"
+            value={editForm.elevadorId || ""}
+            onChange={(e) => setEditField("elevadorId", e.target.value)}
+          >
+            <option value="">Sem vínculo</option>
+            {elevators.map((ev) => (
+              <option key={ev.id} value={ev.id}>
+                {ev.id} — {ev.modelo}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Responsável">
+          <Select
+            value={editForm.responsavelId || ""}
+            onChange={(e) => setEditField("responsavelId", e.target.value)}
+            options={techs}
+          />
+        </Field>
+        <Field label="Abertura">
+          <Input
+            type="date"
+            value={editForm.dataAbertura || ""}
+            onChange={(e) => setEditField("dataAbertura", e.target.value)}
+          />
+        </Field>
+        <Field label="Prazo">
+          <Input
+            type="date"
+            value={editForm.dataLimite || ""}
+            onChange={(e) => setEditField("dataLimite", e.target.value)}
+          />
+        </Field>
+        <Field label="Descrição">
+          <textarea
+            className="input"
+            rows={3}
+            value={editForm.descricao || ""}
+            onChange={(e) => setEditField("descricao", e.target.value)}
+          />
+        </Field>
+      </EditModal>
+
+      <ConfirmDeleteModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={toDelete?.id || ""}
+      />
     </>
   );
 }

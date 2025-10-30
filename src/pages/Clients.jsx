@@ -2,150 +2,113 @@ import { useEffect, useMemo, useState } from "react";
 import { getClients } from "../services/clientsService";
 import Section from "../components/ui/Section";
 import Field from "../components/forms/Field";
-import { validateRequired, isEmail } from "../utils/validators";
+import Input from "../components/ui/Input";
+import EditModal from "../components/ui/EditModal";
+import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
 
 export default function Clients() {
   const [seedList, setSeedList] = useState([]);
-  const [localList, setLocalList] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("clientes") || "[]");
-    } catch {
-      return [];
-    }
-  });
-
+  const [localList, setLocalList] = useState(
+    JSON.parse(localStorage.getItem("clientes") || "[]")
+  );
+  const [deletedIds, setDeletedIds] = useState(
+    JSON.parse(localStorage.getItem("clientes_deleted") || "[]")
+  );
   const [form, setForm] = useState({
     nome: "",
     cnpj: "",
-    responsavel: "",
     telefone: "",
     email: "",
-    endereco: "",
   });
-  const [errors, setErrors] = useState({});
-  const [filtro, setFiltro] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
     getClients()
       .then(setSeedList)
-      .catch(() => setSeedList([]));
+      .catch(() => {});
   }, []);
 
   const lista = useMemo(() => {
-    const all = [...seedList, ...localList];
-    if (!filtro) return all;
-    const t = filtro.toLowerCase();
-    return all.filter(
-      (c) =>
-        c.nome.toLowerCase().includes(t) ||
-        c.responsavel.toLowerCase().includes(t) ||
-        c.cnpj.includes(filtro)
-    );
-  }, [seedList, localList, filtro]);
+    const byId = new Map();
+    for (const c of seedList) byId.set(c.id, c);
+    for (const c of localList) byId.set(c.id, c);
+    return Array.from(byId.values()).filter((x) => !deletedIds.includes(x.id));
+  }, [seedList, localList, deletedIds]);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const setEditField = (k, v) => setEditForm((f) => ({ ...f, [k]: v }));
 
   function handleSubmit(e) {
     e.preventDefault();
-    const req = validateRequired(
-      ["nome", "cnpj", "responsavel", "telefone", "email", "endereco"],
-      form
-    );
-    if (form.email && !isEmail(form.email)) req.email = "E-mail inválido.";
-    setErrors(req);
-    if (Object.keys(req).length) return;
-
-    const novo = { id: "cli-" + Date.now(), ...form };
+    const novo = { id: "CLI-" + Date.now(), ...form };
     const next = [...localList, novo];
     setLocalList(next);
     localStorage.setItem("clientes", JSON.stringify(next));
+    setForm({ nome: "", cnpj: "", telefone: "", email: "" });
+  }
 
-    setForm({
-      nome: "",
-      cnpj: "",
-      responsavel: "",
-      telefone: "",
-      email: "",
-      endereco: "",
-    });
-    setErrors({});
-    alert("Cliente cadastrado!");
+  function openEdit(item) {
+    setEditForm(item);
+    setEditOpen(true);
+  }
+  function saveEdit(e) {
+    e.preventDefault();
+    const updated = { ...editForm };
+    const next = localList.some((c) => c.id === updated.id)
+      ? localList.map((c) => (c.id === updated.id ? updated : c))
+      : [...localList, updated];
+    setLocalList(next);
+    localStorage.setItem("clientes", JSON.stringify(next));
+    setEditOpen(false);
+  }
+
+  function requestDelete(item) {
+    setToDelete(item);
+    setConfirmOpen(true);
+  }
+  function confirmDelete() {
+    const id = toDelete?.id;
+    const next = localList.filter((c) => c.id !== id);
+    setLocalList(next);
+    localStorage.setItem("clientes", JSON.stringify(next));
+    setConfirmOpen(false);
   }
 
   return (
     <>
-      <Section
-        title="Cadastro de Clientes"
-        subtitle="Preencha as informações para registrar um novo cliente."
-      >
+      <Section title="Cadastro de Clientes">
         <form onSubmit={handleSubmit}>
-          <div
-            className="form-grid"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
-          >
-            <Field label="Nome" error={errors.nome}>
-              <input
-                className="input"
+          <div className="form-grid">
+            <Field label="Nome">
+              <Input
                 value={form.nome}
                 onChange={(e) => setField("nome", e.target.value)}
               />
             </Field>
-            <Field label="CNPJ" error={errors.cnpj}>
-              <input
-                className="input"
+            <Field label="CNPJ">
+              <Input
                 value={form.cnpj}
                 onChange={(e) => setField("cnpj", e.target.value)}
               />
             </Field>
-            <Field label="Responsável" error={errors.responsavel}>
-              <input
-                className="input"
-                value={form.responsavel}
-                onChange={(e) => setField("responsavel", e.target.value)}
-              />
-            </Field>
-            <Field label="Telefone" error={errors.telefone}>
-              <input
-                className="input"
+            <Field label="Telefone">
+              <Input
                 value={form.telefone}
                 onChange={(e) => setField("telefone", e.target.value)}
               />
             </Field>
-            <Field label="E-mail" error={errors.email}>
-              <input
-                className="input"
+            <Field label="E-mail">
+              <Input
                 type="email"
                 value={form.email}
                 onChange={(e) => setField("email", e.target.value)}
               />
             </Field>
-            <Field label="Endereço" error={errors.endereco}>
-              <input
-                className="input"
-                value={form.endereco}
-                onChange={(e) => setField("endereco", e.target.value)}
-              />
-            </Field>
           </div>
-
           <div className="actions">
-            <button
-              type="reset"
-              className="btn ghost"
-              onClick={() => {
-                setForm({
-                  nome: "",
-                  cnpj: "",
-                  responsavel: "",
-                  telefone: "",
-                  email: "",
-                  endereco: "",
-                });
-                setErrors({});
-              }}
-            >
-              Limpar
-            </button>
             <button className="btn primary" type="submit">
               Salvar
             </button>
@@ -153,55 +116,81 @@ export default function Clients() {
         </form>
       </Section>
 
-      <Section
-        title="Clientes Cadastrados"
-        subtitle="Base pública + registros novos."
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 12,
-            marginBottom: 12,
-          }}
-        >
-          <input
-            className="input"
-            style={{ maxWidth: 340 }}
-            placeholder="Filtrar por nome, responsável ou CNPJ"
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
-          />
-          <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
-            {lista.length} cliente(s)
-          </div>
-        </div>
-
+      <Section title="Clientes Cadastrados">
         <table className="table">
           <thead>
             <tr>
+              <th style={{ width: 70 }}>Ações</th>
               <th>Nome</th>
               <th>CNPJ</th>
-              <th>Responsável</th>
               <th>Telefone</th>
               <th>E-mail</th>
-              <th>Endereço</th>
             </tr>
           </thead>
           <tbody>
             {lista.map((c) => (
               <tr key={c.id}>
+                <td>
+                  <div className="row-actions">
+                    <button className="icon-btn" onClick={() => openEdit(c)}>
+                      ✏️
+                    </button>
+                    <button
+                      className="icon-btn danger"
+                      onClick={() => requestDelete(c)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
                 <td>{c.nome}</td>
                 <td>{c.cnpj}</td>
-                <td>{c.responsavel}</td>
                 <td>{c.telefone}</td>
                 <td>{c.email}</td>
-                <td>{c.endereco}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </Section>
+
+      <EditModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        title={`Editar Cliente — ${editForm.nome}`}
+        onSubmit={saveEdit}
+      >
+        <Field label="Nome">
+          <Input
+            value={editForm.nome}
+            onChange={(e) => setEditField("nome", e.target.value)}
+          />
+        </Field>
+        <Field label="CNPJ">
+          <Input
+            value={editForm.cnpj}
+            onChange={(e) => setEditField("cnpj", e.target.value)}
+          />
+        </Field>
+        <Field label="Telefone">
+          <Input
+            value={editForm.telefone}
+            onChange={(e) => setEditField("telefone", e.target.value)}
+          />
+        </Field>
+        <Field label="E-mail">
+          <Input
+            value={editForm.email}
+            onChange={(e) => setEditField("email", e.target.value)}
+          />
+        </Field>
+      </EditModal>
+
+      <ConfirmDeleteModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={toDelete?.nome}
+      />
     </>
   );
 }
