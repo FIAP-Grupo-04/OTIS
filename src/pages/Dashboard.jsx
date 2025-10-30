@@ -73,9 +73,9 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        <Card title="Valor Pendente">
+        <Card title="Elevador mais vendido">
           <div className="card-value" style={{ color: "var(--color-orange)" }}>
-            {money(summary.valorPendente.valor)}
+            Atlas Premium
           </div>
           <div className="delta">
             ↗ +{summary.valorPendente.delta}% do mês passado

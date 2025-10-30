@@ -11,9 +11,13 @@ export default function Clients() {
   const [localList, setLocalList] = useState(
     JSON.parse(localStorage.getItem("clientes") || "[]")
   );
-  const [deletedIds, setDeletedIds] = useState(
-    JSON.parse(localStorage.getItem("clientes_deleted") || "[]")
-  );
+  const [deletedIds, setDeletedIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("clientes_deleted") || "[]");
+    } catch {
+      return [];
+    }
+  });
   const [form, setForm] = useState({
     nome: "",
     cnpj: "",
@@ -24,6 +28,7 @@ export default function Clients() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [toDelete, setToDelete] = useState(null);
+  const [filtro, setFiltro] = useState("");
 
   useEffect(() => {
     getClients()
@@ -33,10 +38,24 @@ export default function Clients() {
 
   const lista = useMemo(() => {
     const byId = new Map();
-    for (const c of seedList) byId.set(c.id, c);
-    for (const c of localList) byId.set(c.id, c);
-    return Array.from(byId.values()).filter((x) => !deletedIds.includes(x.id));
-  }, [seedList, localList, deletedIds]);
+    for (const c of seedList) byId.set(String(c.id), c);
+    for (const c of localList) byId.set(String(c.id), c);
+
+    const del = new Set((deletedIds || []).map(String));
+    const all = Array.from(byId.values()).filter((c) => !del.has(String(c.id)));
+
+    const needle = (filtro || "").trim().toLowerCase();
+    if (!needle) return all;
+
+    return all.filter(
+      (c) =>
+        (c.nome || "").toLowerCase().includes(needle) ||
+        (c.responsavel || "").toLowerCase().includes(needle) ||
+        String(c.cnpj || "")
+          .toLowerCase()
+          .includes(needle)
+    );
+  }, [seedList, localList, deletedIds, filtro]);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const setEditField = (k, v) => setEditForm((f) => ({ ...f, [k]: v }));
@@ -66,15 +85,29 @@ export default function Clients() {
   }
 
   function requestDelete(item) {
-    setToDelete(item);
+    setToDelete(item ? { id: String(item.id), nome: item.nome } : null);
     setConfirmOpen(true);
   }
+
   function confirmDelete() {
-    const id = toDelete?.id;
-    const next = localList.filter((c) => c.id !== id);
-    setLocalList(next);
-    localStorage.setItem("clientes", JSON.stringify(next));
+    const id = String(toDelete?.id || "");
+    if (!id) return;
+
+    // se existir no localStorage, removemos de lá
+    if (localList.some((c) => String(c.id) === id)) {
+      const next = localList.filter((c) => String(c.id) !== id);
+      setLocalList(next);
+      localStorage.setItem("clientes", JSON.stringify(next));
+    }
+
+    const nextDel = Array.from(
+      new Set([...(deletedIds || []).map(String), id])
+    );
+    setDeletedIds(nextDel);
+    localStorage.setItem("clientes_deleted", JSON.stringify(nextDel));
+
     setConfirmOpen(false);
+    setToDelete(null);
   }
 
   return (
@@ -117,6 +150,14 @@ export default function Clients() {
       </Section>
 
       <Section title="Clientes Cadastrados">
+        <input
+          className="input"
+          style={{ maxWidth: 300, marginTop: 10, marginBottom: 10 }}
+          placeholder="Filtrar por nome, responsável ou CNPJ"
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+        />
+
         <table className="table">
           <thead>
             <tr>

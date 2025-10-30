@@ -17,9 +17,14 @@ export default function Elevators() {
   const [localList, setLocalList] = useState(() =>
     JSON.parse(localStorage.getItem("elevators") || "[]")
   );
-  const [deletedIds, setDeletedIds] = useState(() =>
-    JSON.parse(localStorage.getItem("elevators_deleted") || "[]")
-  );
+  const [deletedIds, setDeletedIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("elevators_deleted") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
   const [form, setForm] = useState({
     clienteId: "",
     modeloId: "",
@@ -50,16 +55,26 @@ export default function Elevators() {
 
   const lista = useMemo(() => {
     const byId = new Map();
-    for (const it of seedList) byId.set(it.id, it);
-    for (const it of localList) byId.set(it.id, it);
-    return Array.from(byId.values())
-      .filter((x) => !deletedIds.includes(x.id))
-      .filter(
-        (x) =>
-          x.modelo?.toLowerCase().includes(filtro.toLowerCase()) ||
-          x.serie?.toLowerCase().includes(filtro.toLowerCase()) ||
-          x.id.toLowerCase().includes(filtro.toLowerCase())
-      );
+    for (const it of seedList) byId.set(String(it.id), it);
+    for (const it of localList) byId.set(String(it.id), it);
+
+    const del = new Set((deletedIds || []).map(String));
+    const all = Array.from(byId.values()).filter((x) => !del.has(String(x.id)));
+
+    const t = filtro.trim().toLowerCase();
+    if (!t) return all;
+    return all.filter(
+      (x) =>
+        String(x.id || "")
+          .toLowerCase()
+          .includes(t) ||
+        String(x.modelo || "")
+          .toLowerCase()
+          .includes(t) ||
+        String(x.serie || "")
+          .toLowerCase()
+          .includes(t)
+    );
   }, [seedList, localList, deletedIds, filtro]);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -129,15 +144,26 @@ export default function Elevators() {
 
   // === EXCLUIR ===
   function requestDelete(item) {
-    setToDelete(item);
+    setToDelete(item ? { id: String(item.id) } : null);
     setConfirmOpen(true);
   }
+
   function confirmDelete() {
-    const id = toDelete?.id;
+    const id = String(toDelete?.id || "");
     if (!id) return;
-    const next = localList.filter((x) => x.id !== id);
-    setLocalList(next);
-    localStorage.setItem("elevators", JSON.stringify(next));
+
+    if (localList.some((x) => String(x.id) === id)) {
+      const next = localList.filter((x) => String(x.id) !== id);
+      setLocalList(next);
+      localStorage.setItem("elevators", JSON.stringify(next));
+    }
+
+    const nextDel = Array.from(
+      new Set([...(deletedIds || []).map(String), id])
+    );
+    setDeletedIds(nextDel);
+    localStorage.setItem("elevators_deleted", JSON.stringify(nextDel));
+
     setConfirmOpen(false);
     setToDelete(null);
   }
