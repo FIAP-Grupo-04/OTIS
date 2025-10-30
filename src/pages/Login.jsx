@@ -28,6 +28,19 @@ export default function Login() {
       return;
     }
 
+    const found = users.find((u) => u.email === email && u.senha === senha);
+    if (!found) {
+      setErro("Usuário não encontrado. Verifique e-mail e senha.");
+      return;
+    }
+    login(found);
+
+    if (found.role === "funcionario") {
+      navigate("/elevadores", { replace: true });
+    } else {
+      navigate("/dashboard", { replace: true });
+    }
+
     setLoading(true);
     try {
       const found = users.find((u) => u.email === email && u.senha === senha);

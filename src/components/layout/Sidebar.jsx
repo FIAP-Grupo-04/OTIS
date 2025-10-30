@@ -3,19 +3,25 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
+  const isFuncionario = user?.role === "funcionario";
 
   return (
     <>
       <div>
         <div className="sidebar-header">Otis</div>
         <nav className="sidebar-nav">
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            Dashboard
-          </NavLink>
+          {/* 🔒 só mostra Dashboard se não for funcionario */}
+          {!isFuncionario && (
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Dashboard
+            </NavLink>
+          )}
+
           <NavLink
             to="/elevadores"
             className={({ isActive }) => (isActive ? "active" : "")}

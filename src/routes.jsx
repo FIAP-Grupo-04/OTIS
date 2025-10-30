@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import AppShell from "./AppShell";
 
-// Páginas
+// páginas
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
@@ -16,10 +16,15 @@ function RequireAuth() {
   return <Outlet />;
 }
 
-/**
- * Layout protegido: envolve as rotas internas com o AppShell
- * para evitar repetir Sidebar/Topbar em cada página.
- */
+// 🔒 NOVO: bloqueia acesso ao Dashboard para "funcionario"
+function ForbidFuncionario() {
+  const { user } = useAuth();
+  if (user?.role === "funcionario") {
+    return <Navigate to="/elevadores" replace />; // redireciona para uma página permitida
+  }
+  return <Outlet />;
+}
+
 function ProtectedLayout() {
   const { user } = useAuth();
   return (
@@ -39,14 +44,17 @@ export default function RoutesApp() {
       {/* protegidas */}
       <Route element={<RequireAuth />}>
         <Route element={<ProtectedLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route element={<ForbidFuncionario />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
+
+          {/* demais rotas liberadas para todos os logados */}
           <Route path="/clientes" element={<Clients />} />
           <Route path="/elevadores" element={<Elevators />} />
           <Route path="/operacoes" element={<Operations />} />
         </Route>
       </Route>
 
-      {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

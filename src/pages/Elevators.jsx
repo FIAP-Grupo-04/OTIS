@@ -114,21 +114,16 @@ export default function Elevators() {
         subtitle="Preencha os campos para cadastrar um novo elevador."
       >
         <form onSubmit={handleSubmit}>
-          <div className="form-grid">
-            <Field label="Cliente" error={errors.clienteId}>
-              <Select
-                value={form.clienteId}
-                onChange={(e) => setField("clienteId", e.target.value)}
-                options={clients}
-                placeholder="Selecione o cliente"
-              />
-            </Field>
-            <Field label="Modelo" error={errors.modeloId}>
-              <Select
-                value={form.modeloId}
-                onChange={(e) => setField("modeloId", e.target.value)}
-                options={models}
-                placeholder="Selecione o modelo"
+          <div
+            className="form-grid"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          >
+            <Field label="Nome do Modelo" error={errors.capacidadeKg}>
+              <input
+                className="input"
+                type="text"
+                value={form.capacidadeKg}
+                onChange={(e) => setField("capacidadeKg", e.target.value)}
               />
             </Field>
             <Field label="Capacidade (kg)" error={errors.capacidadeKg}>
@@ -149,29 +144,6 @@ export default function Elevators() {
                 onChange={(e) => setField("velocidadeMps", e.target.value)}
               />
             </Field>
-            <Field label="Paradas" error={errors.paradas}>
-              <input
-                className="input"
-                type="number"
-                min="1"
-                value={form.paradas}
-                onChange={(e) => setField("paradas", e.target.value)}
-              />
-            </Field>
-            <Field label="Status">
-              <Select
-                value={form.status}
-                onChange={(e) => setField("status", e.target.value)}
-                options={[
-                  { id: "Em Negociação", nome: "Em Negociação" },
-                  { id: "Aguardando Peças", nome: "Aguardando Peças" },
-                  { id: "Aguardando Proposta", nome: "Aguardando Proposta" },
-                  { id: "Em Instalação", nome: "Em Instalação" },
-                  { id: "Em Produção", nome: "Em Produção" },
-                  { id: "Concluído", nome: "Concluído" },
-                ]}
-              />
-            </Field>
             <Field label="Preço (R$)" error={errors.preco}>
               <input
                 className="input"
@@ -179,17 +151,6 @@ export default function Elevators() {
                 step="100"
                 value={form.preco}
                 onChange={(e) => setField("preco", e.target.value)}
-              />
-            </Field>
-            <Field
-              label="Instalação Prevista"
-              error={errors.instalacaoPrevista}
-            >
-              <input
-                className="input"
-                type="date"
-                value={form.instalacaoPrevista}
-                onChange={(e) => setField("instalacaoPrevista", e.target.value)}
               />
             </Field>
             <Field label="Nº de Série" error={errors.serie}>
@@ -257,14 +218,10 @@ export default function Elevators() {
           <thead>
             <tr>
               <th>Código</th>
-              <th>Cliente</th>
               <th>Modelo</th>
               <th>Capacidade</th>
               <th>Velocidade</th>
-              <th>Paradas</th>
-              <th>Status</th>
               <th>Preço</th>
-              <th>Instalação</th>
               <th>Série</th>
             </tr>
           </thead>
@@ -272,14 +229,10 @@ export default function Elevators() {
             {lista.map((e) => (
               <tr key={e.id}>
                 <td>{e.id}</td>
-                <td>{clientName(e.clienteId)}</td>
                 <td>{e.modelo}</td>
                 <td>{e.capacidadeKg} kg</td>
                 <td>{e.velocidadeMps} m/s</td>
-                <td>{e.paradas}</td>
-                <td>{e.status}</td>
                 <td>{money(e.preco)}</td>
-                <td>{dateBR(e.instalacaoPrevista)}</td>
                 <td>{e.serie}</td>
               </tr>
             ))}
