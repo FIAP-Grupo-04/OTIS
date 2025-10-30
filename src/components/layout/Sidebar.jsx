@@ -8,7 +8,7 @@ export default function Sidebar() {
   return (
     <>
       <div>
-        <div className="sidebar-header">Otis</div>
+        <div className="sidebar-header">Otis | In control</div>
         <nav className="sidebar-nav">
           <NavLink
             to="/dashboard"
