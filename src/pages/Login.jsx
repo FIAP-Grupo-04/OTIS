@@ -58,9 +58,9 @@ export default function Login() {
   return (
     <div className="login-bg">
       <div className="login-card">
-        <div className="brand">
-          <h1>ElevadorPro</h1>
-          <p>Sistema de Gerenciamento de Vendas</p>
+        <div className="portal-brand">
+          <h1>Otis</h1>
+          <p>In control</p>
         </div>
 
         <form className="form" onSubmit={handleSubmit} noValidate>
