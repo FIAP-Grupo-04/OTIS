@@ -1,0 +1,65 @@
+[
+  {
+    "id": "ELV001",
+    "produto": "Elevador Orion 450 kg",
+    "clienteId": "CLI-1001",
+    "documento": "123.456.789-01",
+    "valor": 240000,
+    "situacaoAtual": "Em Produção",
+    "atualizadoEm": "2025-10-20",
+    "historico": [
+      {
+        "data": "2025-09-28",
+        "status": "Pedido Confirmado",
+        "descricao": "Pagamento aprovado e ordem emitida."
+      },
+      {
+        "data": "2025-10-05",
+        "status": "Em Produção",
+        "descricao": "Fabricação do equipamento iniciada."
+      }
+    ]
+  },
+  {
+    "id": "ELV002",
+    "produto": "Elevador Atlas 630 kg",
+    "clienteId": "CLI-1002",
+    "cpf": "987.654.321-00",
+    "valor": 315000,
+    "situacaoAtual": "Aguardando Peças",
+    "atualizadoEm": "2025-10-18",
+    "historico": [
+      {
+        "data": "2025-10-01",
+        "status": "Pedido Confirmado",
+        "descricao": "Pedido recebido e validado."
+      },
+      {
+        "data": "2025-10-12",
+        "status": "Aguardando Peças",
+        "descricao": "Componentes eletrônicos em trânsito."
+      }
+    ]
+  },
+  {
+    "id": "ELV003",
+    "produto": "Modernização Orion (kit completo)",
+    "clienteId": "CLI-1003",
+    "documento": "12.345.678/0001-90",
+    "valor": 175000,
+    "situacaoAtual": "Em Instalação",
+    "atualizadoEm": "2025-10-22",
+    "historico": [
+      {
+        "data": "2025-10-03",
+        "status": "Pedido Confirmado",
+        "descricao": "Contrato assinado."
+      },
+      {
+        "data": "2025-10-15",
+        "status": "Em Instalação",
+        "descricao": "Equipe alocada no endereço do cliente."
+      }
+    ]
+  }
+]

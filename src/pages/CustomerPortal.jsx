@@ -3,43 +3,35 @@ import { getCustomerOrders } from "../services/portalService";
 import { getClients } from "../services/clientsService";
 import "../styles/portal.css";
 
-export default function CustomerPortal() {
+export default function PortalCliente() {
   const [orders, setOrders] = useState([]);
   const [clients, setClients] = useState([]);
   const [codigo, setCodigo] = useState("");
-  const [cpf, setCpf] = useState("");
+  const [docInput, setDocInput] = useState(""); // CPF/CNPJ digitado
   const [buscou, setBuscou] = useState(false);
 
   useEffect(() => {
     Promise.all([getCustomerOrders(), getClients()])
       .then(([o, c]) => {
-        setOrders(o || []);
-        setClients(c || []);
+        setOrders(Array.isArray(o) ? o : []);
+        setClients(Array.isArray(c) ? c : []);
       })
-      .catch(() => {});
+      .catch(() => {
+        setOrders([]);
+        setClients([]);
+      });
   }, []);
 
-  const resultados = useMemo(() => {
-    if (!buscou) return [];
-    const cod = codigo.trim().toLowerCase();
-    const doc = cpf.replace(/\D/g, "");
-    return orders.filter(
-      (o) =>
-        o.id.toLowerCase() === cod &&
-        (o.cpf?.replace(/\D/g, "") === doc ||
-          o.documento?.replace(/\D/g, "") === doc)
-    );
-  }, [buscou, codigo, cpf, orders]);
-
+  const normalizeDoc = (s = "") => String(s).replace(/\D/g, "");
   const nomeCliente = (id) => clients.find((c) => c.id === id)?.nome ?? id;
   const money = (v) =>
-    Number(v).toLocaleString("pt-BR", {
+    Number(v || 0).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
       maximumFractionDigits: 0,
     });
   const dateBR = (s) => (s ? new Date(s).toLocaleDateString("pt-BR") : "-");
-  const badge = (s) =>
+  const badge = (s = "") =>
     /Conclu/i.test(s)
       ? "b-green"
       : /Instala/i.test(s)
@@ -48,33 +40,40 @@ export default function CustomerPortal() {
       ? "b-yellow"
       : "b-orange";
 
+  const resultados = useMemo(() => {
+    if (!buscou) return [];
+    const cod = codigo.trim().toLowerCase();
+    const doc = normalizeDoc(docInput);
+
+    return orders.filter((o) => {
+      const idOk = String(o.id || "").toLowerCase() === cod;
+      const docJson = normalizeDoc(o.cpf ?? o.documento ?? "");
+      return idOk && docJson === doc;
+    });
+  }, [buscou, codigo, docInput, orders]);
+
   function handleBuscar(e) {
     e.preventDefault();
-    if (!codigo.trim() || !cpf.trim())
-      return alert("Preencha Código do Produto e CPF.");
+    if (!codigo.trim() || !docInput.trim()) {
+      alert("Preencha Código do Produto e CPF/CNPJ.");
+      return;
+    }
     setBuscou(true);
   }
 
   return (
     <div className="portal-bg">
-      <div className="portal-brand">
-        <h1>Otis</h1>
-        <p>In control</p>
-      </div>
-
-      <h2 className="portal-title">Portal do Cliente</h2>
-      <p className="portal-subtitle">Acompanhe o status do seu elevador</p>
-
-      {/* Card principal */}
+      {/* Card principal de busca */}
       <div className="portal-card">
         <div className="portal-card-brand">
           <h3>Otis</h3>
           <p>In control</p>
         </div>
+
         <h4 className="portal-card-title">Portal do Cliente</h4>
         <p className="portal-card-subtitle">
-          Digite o código do seu produto e CPF para acompanhar o status do seu
-          elevador Otis
+          Digite o código do seu produto e CPF/CNPJ para acompanhar o status do
+          seu elevador Otis.
         </p>
 
         <form onSubmit={handleBuscar} className="portal-form" noValidate>
@@ -85,55 +84,30 @@ export default function CustomerPortal() {
               placeholder="Ex: ELV001"
               value={codigo}
               onChange={(e) => setCodigo(e.target.value)}
+              inputMode="latin"
+              autoComplete="off"
             />
           </div>
+
           <div className="field">
-            <label className="label">CPF</label>
+            <label className="label">CPF / CNPJ</label>
             <input
               className="input"
-              placeholder="000.000.000-00"
-              value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
+              placeholder="000.000.000-00 ou 00.000.000/0000-00"
+              value={docInput}
+              onChange={(e) => setDocInput(e.target.value)}
+              inputMode="numeric"
+              autoComplete="off"
             />
           </div>
+
           <button className="btn-primary" type="submit">
             Consultar Status
           </button>
         </form>
       </div>
 
-      {/* Card de exemplos */}
-      <div className="portal-card">
-        <div className="help-icon" aria-hidden>
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path
-              d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"
-              fill="#2267f2"
-              opacity="0.15"
-            />
-            <path
-              d="M12 3v18M3 7.5l9 4.5m9-4.5-9 4.5"
-              stroke="#2267f2"
-              strokeWidth="1.5"
-              fill="none"
-            />
-          </svg>
-        </div>
-        <h4 className="portal-card-title">Acompanhe seu Elevador Otis</h4>
-        <p className="portal-card-subtitle">
-          Digite o código do produto e seu CPF acima para acompanhar o status
-          completo do seu elevador.
-        </p>
-        <div className="examples">
-          <div className="examples-title">Exemplos de códigos:</div>
-          <ul>
-            <li>ELV001 — CPF: 123.456.789-01</li>
-            <li>ELV002 — CPF: 987.654.321-00</li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Resultado da busca */}
+      {/* Resultado */}
       {buscou && (
         <div style={{ width: "100%", maxWidth: 840 }}>
           {resultados.length === 0 ? (
