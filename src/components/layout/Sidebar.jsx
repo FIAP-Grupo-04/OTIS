@@ -20,7 +20,7 @@ export default function Sidebar() {
             to="/elevadores"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            Elevadores
+            Produtos
           </NavLink>
           <NavLink
             to="/clientes"
