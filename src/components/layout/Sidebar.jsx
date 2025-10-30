@@ -10,7 +10,7 @@ export default function Sidebar() {
   return (
     <>
       <div>
-        <div className="sidebar-header">Otis</div>
+        <div className="sidebar-header">Otis | In control</div>
         <nav className="sidebar-nav">
           {/* 🔒 só mostra Dashboard se não for funcionario */}
           {!isFuncionario && (
@@ -26,7 +26,7 @@ export default function Sidebar() {
             to="/elevadores"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            Elevadores
+            Produtos
           </NavLink>
           <NavLink
             to="/clientes"
