@@ -53,20 +53,41 @@ export async function list(table) {
 
 export async function create(table, data) {
   const rows = readLocal(table);
-  let id = data.id;
+
+  // prefixo direto aqui (sem helper externo)
+  const prefix =
+    table === "elevators"  ? "ELV-" :
+    table === "operations" ? "OP-"  :
+    table === "clients"    ? "CLI-" :
+    table === "users"      ? "USR-" :
+                             "ID-";
+
+  // respeita id vindo de fora; se não vier, gera olhando seed + local
+  let id = data?.id;
   if (!id) {
-    const prefix =
-      table === "elevators" ? "ELV-" : table === "operations" ? "OP-" : "ID-";
-    const next = String(rows.filter((r) => !r.__deleted).length + 1).padStart(
-      4,
-      "0"
-    );
+    // pega a lista mesclada (seed + local, já com deletes resolvidos)
+    const merged = await list(table); // <- usa sua própria list() que já mescla tudo
+
+    // maior sufixo numérico para este prefixo
+    let max = 0;
+    for (const r of merged) {
+      const rid = r?.id;
+      if (typeof rid === "string" && rid.startsWith(prefix)) {
+        const n = parseInt(rid.slice(prefix.length), 10);
+        if (!Number.isNaN(n) && n > max) max = n;
+      }
+    }
+
+    const next = String(max + 1).padStart(4, "0");
     id = `${prefix}${next}`;
   }
 
-  const filtered = rows.filter((r) => !(r.__deleted && r.id === id));
+  // remove qualquer registro local com o mesmo id (inclui __deleted)
+  const nextLocal = rows.filter((r) => r?.id !== id);
+
+  // grava no localStorage e notifica
   const row = { ...data, id };
-  writeLocal(table, [...filtered, row]);
+  writeLocal(table, [...nextLocal, row]);
   return row;
 }
 
