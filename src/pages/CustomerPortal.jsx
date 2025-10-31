@@ -154,9 +154,9 @@ export default function CustomerPortal() {
                     style={{
                       border: "1px solid var(--line, #e5e7eb)",
                       borderRadius: 10,
-                      padding: 12,
+                      padding: 14,
                       display: "grid",
-                      gap: 8,
+                      gap: 10,
                     }}
                   >
                     <div
@@ -182,6 +182,35 @@ export default function CustomerPortal() {
                         {o.status}
                       </span>
                     </div>
+
+                    {/* botão de contato (aparece apenas se não estiver concluído) */}
+                    {!/Conclu/i.test(o.status) && (
+                      <div>
+                        <a
+                          href={`https://wa.me/?text=Olá,%20gostaria%20de%20saber%20sobre%20o%20pedido%20${o.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            background: "#86efac",
+                            color: "#065f46",
+                            fontWeight: 600,
+                            fontSize: 13,
+                            padding: "6px 14px",
+                            borderRadius: 6,
+                            textDecoration: "none",
+                            transition: "background 0.2s",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.target.style.background = "#4ade80")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.target.style.background = "#86efac")
+                          }
+                        >
+                          Enviar mensagem
+                        </a>
+                      </div>
+                    )}
 
                     <div
                       style={{
