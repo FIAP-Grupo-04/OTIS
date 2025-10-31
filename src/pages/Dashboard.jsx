@@ -116,33 +116,21 @@ export default function Dashboard() {
       >
         <Card title="Total de Operações">
           <div className="card-value">{summary.totalVendas.valor}</div>
-          <div className="delta">
-            ↗ +{summary.totalVendas.delta}% do mês passado
-          </div>
         </Card>
 
         <Card title="Faturamento">
           <div className="card-value" style={{ color: "var(--color-green)" }}>
             {money(summary.faturamento.valor)}
           </div>
-          <div className="delta">
-            ↗ +{summary.faturamento.delta}% do mês passado
-          </div>
         </Card>
 
         <Card title="Operações Pendentes">
           <div className="card-value">{summary.vendasPendentes.valor}</div>
-          <div className="delta">
-            ↘ {summary.vendasPendentes.delta}% do mês passado
-          </div>
         </Card>
 
         <Card title="Modelo mais recorrente">
           <div className="card-value" style={{ color: "var(--color-orange)" }}>
             {summary.modeloMais.nome || "—"}
-          </div>
-          <div className="delta">
-            ↗ +{summary.modeloMais.delta}% do mês passado
           </div>
         </Card>
       </div>
