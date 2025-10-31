@@ -114,7 +114,12 @@ export default function Login() {
           bottom: 20,
           right: 20,
           fontSize: 14,
-          color: "var(--color-blue, #2267f2)",
+          backgroundColor: "var(--color-blue, #2267f2)",
+          color: "#ffffff",
+          padding: "8px 12px",
+          borderRadius: 8,
+          boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+          display: "inline-block",
         }}
       >
         <Link
