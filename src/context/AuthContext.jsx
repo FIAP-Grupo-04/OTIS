@@ -5,7 +5,6 @@ const AuthCtx = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  // carrega sessão ao iniciar
   useEffect(() => {
     try {
       const raw = localStorage.getItem("user");

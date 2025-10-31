@@ -1,15 +1,5 @@
 import { useEffect } from "react";
 
-/**
- * Componente Modal reutilizável
- *
- * Props:
- * - open (boolean): se o modal está visível
- * - onClose (function): chamada ao clicar fora ou pressionar Esc
- * - title (string): título exibido no cabeçalho
- * - children (ReactNode): conteúdo interno
- * - width (opcional): define largura máxima, padrão 760px
- */
 export default function Modal({ open, onClose, title, children, width = 760 }) {
   useEffect(() => {
     if (!open) return;
@@ -17,7 +7,7 @@ export default function Modal({ open, onClose, title, children, width = 760 }) {
       if (e.key === "Escape") onClose?.();
     };
     window.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden"; // trava scroll
+    document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";

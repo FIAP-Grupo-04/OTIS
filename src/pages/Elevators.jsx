@@ -18,7 +18,6 @@ export default function Elevators() {
   const [list, setList] = useState([]);
   const [filtro, setFiltro] = useState("");
 
-  // campos do form
   const [form, setForm] = useState({
     modelo: "",
     capacidadeKg: "",
@@ -27,7 +26,6 @@ export default function Elevators() {
   });
   const [errors, setErrors] = useState({});
 
-  // modais
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [editForm, setEditForm] = useState({});
@@ -202,7 +200,6 @@ export default function Elevators() {
             <thead>
               <tr>
                 <th style={{ width: 70 }}>Ações</th>
-                {/* <th>ID</th>  // removido do visual */}
                 <th>Modelo</th>
                 <th>Capacidade</th>
                 <th>Velocidade</th>
@@ -230,7 +227,6 @@ export default function Elevators() {
                       </button>
                     </div>
                   </td>
-                  {/* <td>{e.id}</td>  // removido */}
                   <td>{e.modelo}</td>
                   <td>{e.capacidadeKg} kg</td>
                   <td>{e.velocidadeMps} m/s</td>
@@ -246,7 +242,7 @@ export default function Elevators() {
       <EditModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        title={`Editar Produto — ${editForm.modelo || ""}`} // título com o modelo
+        title={`Editar Produto — ${editForm.modelo || ""}`}
         onSubmit={saveEdit}
       >
         <Field label="Modelo">
@@ -283,7 +279,7 @@ export default function Elevators() {
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={confirmDelete}
-        itemName={toDelete?.modelo || ""} // confirmação com o modelo
+        itemName={toDelete?.modelo || ""}
       />
     </>
   );

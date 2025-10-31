@@ -1,8 +1,3 @@
-/**
- * Input: campo de texto básico.
- * Usa classes padronizadas do forms.css
- * Props padrão: type, value, onChange, placeholder, name, id, disabled, etc.
- */
 export default function Input({
   type = "text",
   value,

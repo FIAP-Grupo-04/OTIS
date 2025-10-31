@@ -15,7 +15,6 @@ import {
 import { getClients } from "../services/clientsService";
 import { getElevators } from "../services/elevatorsService";
 
-// formata YYYY-MM-DD em pt-BR de forma segura
 const dateBRsafe = (s) => {
   if (!s) return "";
   const d = new Date(s);
@@ -23,7 +22,6 @@ const dateBRsafe = (s) => {
   return ok ? d.toLocaleDateString("pt-BR") : "";
 };
 
-// série estática: últimos 6 meses anteriores ao mês atual
 function last6MonthsStatic() {
   const now = new Date();
   const arr = [];
@@ -33,7 +31,7 @@ function last6MonthsStatic() {
       2,
       "0"
     )}`;
-    const valor = 4 + (d.getMonth() % 6) * 2; // qualquer padrão que queira
+    const valor = 4 + (d.getMonth() % 6) * 2;
     arr.push({ mes, valor });
   }
   return arr;
@@ -41,9 +39,9 @@ function last6MonthsStatic() {
 
 export default function Dashboard() {
   const [summary, setSummary] = useState(null);
-  const [months, setMonths] = useState([]); // [{label, value}]
-  const [status, setStatus] = useState(null); // {negociacao, preparacao, integracao, concluido}
-  const [openSales, setOpenSales] = useState([]); // dados já formatados p/ tabela
+  const [months, setMonths] = useState([]);
+  const [status, setStatus] = useState(null);
+  const [openSales, setOpenSales] = useState([]);
   const [clients, setClients] = useState([]);
   const [elevators, setElevators] = useState([]);
 
@@ -57,7 +55,6 @@ export default function Dashboard() {
         getElevators(),
       ]);
 
-      // --------- CARDS dinâmicos
       setSummary({
         totalVendas: { valor: Number(sum.total || 0), delta: sum.deltas.total },
         faturamento: {
@@ -71,10 +68,8 @@ export default function Dashboard() {
         modeloMais: { nome: sum.modeloMais, delta: sum.deltas.modelo },
       });
 
-      // gráfico por mês (estático)
       setMonths(last6MonthsStatic());
 
-      // --------- DONUT por status
       setStatus({
         negociacao: Number(byStatus["Em Negociação"] || 0),
         preparacao: Number(byStatus["Aguardando Peças"] || 0),
@@ -82,7 +77,6 @@ export default function Dashboard() {
         concluido: Number(byStatus["Concluída"] || 0),
       });
 
-      // --------- TABELA ABERTAS (prazo = dataLimite) + produto pelo NOME
       const nameOfClient = (id) =>
         (cli || []).find((c) => c.id === id)?.nome || id;
       const nameOfProduct = (id) =>
@@ -90,10 +84,10 @@ export default function Dashboard() {
 
       const openMapped = (open || []).map((o) => ({
         cliente: nameOfClient(o.clienteId),
-        elevador: nameOfProduct(o.elevadorId), // envia NOME (vamos renomear a coluna no componente)
+        elevador: nameOfProduct(o.elevadorId),
         status: o.status || "—",
         valor: Number(o.valor || 0),
-        prazo: dateBRsafe(o.dataLimite) || "", // só prazo (entrega)
+        prazo: dateBRsafe(o.dataLimite) || "",
       }));
       setOpenSales(openMapped);
 
@@ -168,7 +162,7 @@ export default function Dashboard() {
           <p className="subtitle" style={{ marginTop: 0 }}>
             Quantidade de operações realizadas nos últimos meses
           </p>
-          <BarChart data={months} /> {/* months: [{label, value}] */}
+          <BarChart data={months} />
         </div>
 
         <div className="panel">

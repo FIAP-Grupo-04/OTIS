@@ -107,7 +107,7 @@ export default function Login() {
         </form>
       </div>
 
-      {/* link fixo para o portal do cliente */}
+      {/* link para o portal do cliente */}
       <div
         style={{
           position: "absolute",

@@ -78,31 +78,27 @@
   text-align: right;
 }
 
-/* Contêiner que dá scroll quando a tabela ficar maior que a largura/altura */
 .table-scroll {
   width: 100%;
-  overflow-x: auto; /* barra horizontal quando precisar */
-  overflow-y: auto; /* barra vertical (combinada com max-height) */
-  max-height: 60vh; /* ajuste a gosto; dá barra vertical se passar disso */
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 60vh;
   border-radius: 10px;
 }
 
-/* Evita que cabeçalhos quebrem linha e “esticam” largura mínima */
 .table th,
 .table td {
   white-space: nowrap;
 }
 
-/* Ajuda a forçar largura mínima razoável pra aparecer scroll horizontal */
 .table {
-  min-width: 960px; /* ajuste a gosto (1200px se tiver mais colunas) */
+  min-width: 960px;
 }
 
-/* Cabeçalho fixo (grudado) com fundo e leve sombra */
 .table thead th {
   position: sticky;
   top: 0;
-  background: var(--panel, #fff); /* cor sólida — usa var se existir */
+  background: var(--panel, #fff);
   z-index: 2;
   box-shadow: inset 0 -1px 0 #d1d5db, 0 1px 2px rgba(0, 0, 0, 0.05);
 }

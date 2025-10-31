@@ -1,7 +1,3 @@
-/**
- * BarChart em SVG puro (sem libs) para manter fácil de manter.
- * props: data = [{mes, valor}] OU [{label, value}], max (opcional)
- */
 export default function BarChart({ data = [], height = 260, max }) {
   const pad = 28;
   const w = 720;
@@ -9,12 +5,10 @@ export default function BarChart({ data = [], height = 260, max }) {
   const innerW = w - pad * 2;
   const innerH = h - pad * 2;
 
-  // aceita ambos formatos
   const getVal = (d) => Number(d?.valor ?? d?.value ?? 0);
   const getLbl = (d) => String(d?.mes ?? d?.label ?? "");
   const n = Array.isArray(data) ? data.length : 0;
 
-  // evita NaN/Infinity quando não há dados
   const maxVal = Math.max(max ?? Math.max(...(n ? data.map(getVal) : [0])), 1);
   const stepX = n ? innerW / n : innerW;
 

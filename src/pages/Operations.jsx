@@ -1,4 +1,3 @@
-// src/pages/Operations.jsx
 import { useEffect, useMemo, useState, useCallback } from "react";
 import Section from "../components/ui/Section";
 import Field from "../components/forms/Field";
@@ -19,7 +18,6 @@ import {
   onOperationsChange,
 } from "../services/operationsService";
 
-// Captura valor de <select> nativo e do Select custom
 const pickValue = (evOrVal) => {
   if (evOrVal && evOrVal.target) return evOrVal.target.value;
   if (typeof evOrVal === "object" && evOrVal !== null) {
@@ -28,7 +26,6 @@ const pickValue = (evOrVal) => {
   return evOrVal ?? "";
 };
 
-// Normaliza objeto para validação (string + trim)
 const normalize = (obj) =>
   Object.fromEntries(
     Object.entries(obj).map(([k, v]) => [
@@ -72,7 +69,6 @@ export default function Operations() {
   const [statusFiltro, setStatusFiltro] = useState("");
   const [paisFiltro, setPaisFiltro] = useState("");
 
-  // flags para não sobrescrever quando o usuário digitar manualmente
   const [valorTouched, setValorTouched] = useState(false);
   const [valorTouchedEdit, setValorTouchedEdit] = useState(false);
   const [addrTouched, setAddrTouched] = useState(false);
@@ -89,7 +85,7 @@ export default function Operations() {
     dataLimite: "",
     valor: "",
     pais: "Brasil",
-    enderecoEntrega: "", // 👈 novo campo
+    enderecoEntrega: "",
     descricao: "",
   });
   const [errors, setErrors] = useState({});
@@ -192,8 +188,6 @@ export default function Operations() {
         "responsavelTecnico",
         "dataAbertura",
         "dataLimite",
-        // "pais",
-        // "enderecoEntrega", // 👈 descomente se quiser obrigatório
       ],
       norm
     );
@@ -251,8 +245,6 @@ export default function Operations() {
         "responsavelTecnico",
         "dataAbertura",
         "dataLimite",
-        // "pais",
-        // "enderecoEntrega", // 👈 descomente se quiser obrigatório
       ],
       norm
     );
@@ -280,7 +272,6 @@ export default function Operations() {
     setToDelete(null);
   }
 
-  // lista mostrada (inclui endereçoEntrega e filtros)
   const lista = useMemo(() => {
     const term = (q || "").trim().toLowerCase();
     const base = Array.isArray(ops) ? ops : [];
@@ -357,7 +348,6 @@ export default function Operations() {
                 value={form.clienteId}
                 onChange={(v) => {
                   setField("clienteId", pickValue(v));
-                  // endereço puxa do cliente, mas só se o usuário ainda não digitou nada
                   if (!addrTouched) {
                     const cli = clients.find((c) => c.id === pickValue(v));
                     if (cli?.endereco)
@@ -369,7 +359,6 @@ export default function Operations() {
               />
             </Field>
 
-            {/* PRODUTO */}
             <Field label="Produto" error={errors.elevadorId}>
               <select
                 className="input"
@@ -443,7 +432,6 @@ export default function Operations() {
               />
             </Field>
 
-            {/* ENDEREÇO DE ENTREGA */}
             <div className="col-span-2">
               <Field label="Endereço de Entrega">
                 <textarea
@@ -744,7 +732,6 @@ export default function Operations() {
             />
           </Field>
 
-          {/* ENDEREÇO DE ENTREGA no modal (ocupando 2 colunas) */}
           <div className="col-span-2">
             <Field label="Endereço de Entrega">
               <textarea
@@ -761,7 +748,6 @@ export default function Operations() {
             </Field>
           </div>
 
-          {/* Descrição já ocupando 2 colunas */}
           <div className="col-span-2">
             <Field label="Descrição (opcional)">
               <textarea

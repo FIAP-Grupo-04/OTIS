@@ -1,5 +1,3 @@
-// src/services/db.js
-
 import { fetchJson } from "./dataClient";
 
 const TABLES = {
@@ -33,18 +31,15 @@ export const subscribe = (table, fn) => {
 export async function list(table) {
   const [seed, local] = await Promise.all([readSeed(table), readLocal(table)]);
 
-  // 1) índices auxiliares de tombstones
   const deletedIds = new Set(
     local.filter((r) => r && r.__deleted).map((r) => r.id)
   );
 
-  // 2) começa com seed, mas pula o que foi tombstoned
   const byId = new Map();
   for (const r of seed) {
     if (!deletedIds.has(r.id)) byId.set(r.id, r);
   }
 
-  // 3) aplica alterações locais (updates/creates) e também ignora tombstones
   for (const r of local) {
     if (r && r.__deleted) {
       byId.delete(r.id);
@@ -68,7 +63,7 @@ export async function create(table, data) {
     );
     id = `${prefix}${next}`;
   }
-  // se havia tombstone com o mesmo id, removemos
+
   const filtered = rows.filter((r) => !(r.__deleted && r.id === id));
   const row = { ...data, id };
   writeLocal(table, [...filtered, row]);
@@ -87,17 +82,14 @@ export async function update(table, data) {
   return data;
 }
 
-// ✅ remove com tombstone (funciona para itens do seed)
 export async function remove(table, id) {
   const rows = readLocal(table);
   const hadLocal = rows.some((r) => r.id === id && !r.__deleted);
 
   let next;
   if (hadLocal) {
-    // deletando algo criado/alterado localmente: remove duro
     next = rows.filter((r) => r.id !== id);
   } else {
-    // deletando algo que só existe no seed: grava tombstone
     next = [...rows, { id, __deleted: true }];
   }
   writeLocal(table, next);

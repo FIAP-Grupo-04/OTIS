@@ -16,11 +16,11 @@ function RequireAuth() {
   return <Outlet />;
 }
 
-// 🔒 NOVO: bloqueia acesso ao Dashboard para "funcionario"
+// bloqueia acesso ao Dashboard para "funcionario"
 function ForbidFuncionario() {
   const { user } = useAuth();
   if (user?.role === "funcionario") {
-    return <Navigate to="/elevadores" replace />; // redireciona para uma página permitida
+    return <Navigate to="/elevadores" replace />;
   }
   return <Outlet />;
 }

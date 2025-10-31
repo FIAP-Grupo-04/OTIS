@@ -1,7 +1,3 @@
-/**
- * DonutChart simples com cálculo de arcos (SVG).
- * props: data = [{label, value, color}]
- */
 export default function DonutChart({ data = [], size = 240, hole = 80 }) {
   const total = data.reduce((a, b) => a + b.value, 0) || 1;
   const r = size / 2;

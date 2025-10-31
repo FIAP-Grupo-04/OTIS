@@ -1,14 +1,5 @@
 import Modal from "./Modal";
 
-/**
- * Modal simples de confirmação de exclusão
- *
- * Props:
- * - open (bool)
- * - onClose (function)
- * - onConfirm (function)
- * - itemName (string)
- */
 export default function ConfirmDeleteModal({
   open,
   onClose,

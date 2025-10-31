@@ -59,8 +59,6 @@ export default function CustomerPortal() {
     // filtra operações do cliente
     const meus = ops.filter((o) => o.clienteId === clienteId);
 
-    // ordena: mais recente em cima.
-    // prioridade de ordenação: dataLimite (prazo) desc; fallback: dataAbertura desc
     const sorted = [...meus].sort((a, b) => {
       const da =
         safeDate(a.dataLimite) || safeDate(a.dataAbertura) || new Date(0);
@@ -91,15 +89,12 @@ export default function CustomerPortal() {
 
   return (
     <div className="portal-bg">
-      {/* Branding opcional */}
       <div className="portal-brand">
         <h1>Otis</h1>
         <p>In control</p>
       </div>
 
       <h2 className="portal-title">Portal do Cliente</h2>
-
-      {/* Card principal — busca por CNPJ */}
       <div className="portal-card">
         <h4 className="portal-card-title">Consultar pedidos</h4>
         <p className="portal-card-subtitle">
@@ -125,7 +120,6 @@ export default function CustomerPortal() {
         </form>
       </div>
 
-      {/* Resultado */}
       {buscou && (
         <div style={{ width: "100%", maxWidth: 840 }}>
           {!clienteId ? (
@@ -165,7 +159,6 @@ export default function CustomerPortal() {
                       gap: 8,
                     }}
                   >
-                    {/* topo: produto + status */}
                     <div
                       style={{
                         display: "flex",
@@ -190,7 +183,6 @@ export default function CustomerPortal() {
                       </span>
                     </div>
 
-                    {/* barra de infos */}
                     <div
                       style={{
                         display: "grid",
@@ -219,7 +211,6 @@ export default function CustomerPortal() {
                       </div>
                     </div>
 
-                    {/* descrição, se houver */}
                     {o.descricao && (
                       <div
                         style={{

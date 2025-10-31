@@ -13,8 +13,3 @@ export function validateRequired(fields, form) {
 export function isEmail(str) {
   return /\S+@\S+\.\S+/.test(str);
 }
-
-/** Valida CPF apenas pelo formato (não faz o cálculo dos dígitos) */
-export function isCPF(str) {
-  return /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(str);
-}

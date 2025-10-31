@@ -13,10 +13,8 @@ export default function OpenSalesTable({ items = [] }) {
     return "b-orange";
   };
 
-  // usa prazo pronto; se vier ISO, formata com fallback seguro
   const safeDate = (s) => {
     if (!s) return "-";
-    // se já veio formatado (dd/mm/aaaa), só devolve
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
     const d = new Date(s);
     return Number.isNaN(d.getTime()) ? "-" : d.toLocaleDateString("pt-BR");

@@ -25,7 +25,6 @@ export default function Clients() {
   const [list, setList] = useState([]);
   const [filtro, setFiltro] = useState("");
 
-  // ⬇️ padronizado com cpfCnpj
   const [form, setForm] = useState({
     nome: "",
     cpfCnpj: "",
@@ -90,7 +89,6 @@ export default function Clients() {
 
   // EDIT
   function openEdit(item) {
-    // aceita tanto cpfCnpj (seed novo) quanto cnpj (se algum registro antigo tiver)
     setEditForm({
       id: item.id,
       nome: item.nome || "",
@@ -116,7 +114,7 @@ export default function Clients() {
       return;
     }
 
-    await updateClient(norm); // garante que salvamos como cpfCnpj
+    await updateClient(norm);
     setEditOpen(false);
   }
 

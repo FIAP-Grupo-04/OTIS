@@ -1,4 +1,4 @@
-/** Formata número em moeda BRL (ex.: 12345 → R$ 12.345) */
+/** Formata número em moeda BRL */
 export const money = (v) =>
   Number(v || 0).toLocaleString("pt-BR", {
     style: "currency",

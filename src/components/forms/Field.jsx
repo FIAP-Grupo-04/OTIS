@@ -1,10 +1,3 @@
-/**
- * Field: container genérico de campo de formulário.
- * Exemplo:
- * <Field label="Nome" error={errors.nome}>
- *   <Input value={...} onChange={...} />
- * </Field>
- */
 export default function Field({ label, error, children, required }) {
   return (
     <div className="field">

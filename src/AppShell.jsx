@@ -15,21 +15,18 @@ export default function AppShell({ user, children }) {
 
   return (
     <div className="app">
-      {/* Backdrop só no mobile; fecha ao clicar fora */}
       <div
         className={`sidebar-backdrop ${menuOpen ? "show" : ""}`}
         onClick={closeMenu}
         aria-hidden={!menuOpen}
       />
 
-      {/* Sidebar recebe a classe is-open quando menuOpen=true */}
       <aside className={`sidebar ${menuOpen ? "is-open" : ""}`}>
         <Sidebar onItemClick={closeMenu} />
       </aside>
 
       <main className="main">
         <header className="topbar">
-          {/* Botão hamburguer: o CSS já foi colado antes */}
           <button
             className="hamburger"
             aria-label="Abrir menu"
@@ -38,7 +35,6 @@ export default function AppShell({ user, children }) {
             <span />
           </button>
 
-          {/* Seu Topbar continua igual; se quiser, ele também pode chamar toggle via prop */}
           <Topbar user={user} onMenuToggle={toggleMenu} />
         </header>
 

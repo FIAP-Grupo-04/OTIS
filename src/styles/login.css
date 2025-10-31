@@ -1,4 +1,3 @@
-/* Fundo e centralização */
 .login-bg {
   min-height: 100vh;
   display: grid;
@@ -7,7 +6,6 @@
   padding: 24px;
 }
 
-/* Card do login */
 .login-card {
   width: 100%;
   max-width: 520px;
@@ -18,7 +16,6 @@
   padding: 22px;
 }
 
-/* Branding */
 .brand {
   margin-bottom: 14px;
 }
@@ -33,13 +30,11 @@
   color: var(--color-muted);
 }
 
-/* Reuso das classes de forms.css para inputs/botões */
 .form {
   display: grid;
   gap: 8px;
 }
 
-/* Garantias visuais nos inputs do login (usa tokens e forms.css) */
 .input {
   width: 100%;
   padding: 10px 12px;

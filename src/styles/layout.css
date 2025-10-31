@@ -13,11 +13,6 @@ body {
   overflow: hidden; /* scroll só no conteúdo */
 }
 
-/* ===================================================================
-   APP SHELL - estrutura principal
-   .app = linha (sidebar + main)
-   .main = coluna (topbar + content)
-=================================================================== */
 .app {
   display: flex;
   min-height: 100vh;
@@ -31,16 +26,14 @@ body {
   border-right: 1px solid var(--color-border);
   box-shadow: var(--shadow);
 
-  /* organização interna */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding-top: 16px;
   padding-bottom: 8px;
-  overflow-y: auto; /* se faltar altura, rola no próprio menu */
+  overflow-y: auto;
 }
 
-/* topo (logo + navegação) */
 .sidebar > div:first-child {
   display: flex;
   flex-direction: column;
@@ -55,7 +48,6 @@ body {
   color: var(--color-primary-ink);
 }
 
-/* links */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
@@ -64,6 +56,7 @@ body {
   padding: 0 12px;
   margin-top: 12px;
 }
+
 .sidebar-nav a {
   display: flex;
   align-items: center;
@@ -74,6 +67,7 @@ body {
   text-decoration: none;
   transition: background 0.15s, color 0.15s;
 }
+
 .sidebar-nav a.active,
 .sidebar-nav a:hover {
   background: var(--color-blue-soft);
@@ -81,7 +75,6 @@ body {
   font-weight: 600;
 }
 
-/* rodapé (Sair ancorado embaixo) */
 .sidebar-footer {
   margin-top: auto;
   padding: 12px;
@@ -90,6 +83,7 @@ body {
   font-size: 0.85rem;
   color: var(--color-muted);
 }
+
 .sidebar-footer button {
   border: none;
   background: transparent;
@@ -99,15 +93,13 @@ body {
   cursor: pointer;
 }
 
-/* coluna principal (topo + conteúdo) */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* evita overflow horizontal */
+  min-width: 0;
 }
 
-/* topo */
 .topbar {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
@@ -117,11 +109,10 @@ body {
   align-items: center;
 }
 
-/* conteúdo que rola */
 .content {
   flex: 1;
   padding: 24px;
-  overflow: auto; /* rolagem só aqui */
+  overflow: auto;
 }
 
 /* ===================================================================
@@ -145,14 +136,11 @@ body {
   font-size: 0.9rem;
 }
 
-/* ===================================================================
-   TABELAS (sticky header + scroll quando necessário)
-=================================================================== */
 .table-scroll {
   width: 100%;
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 60vh; /* vira rolagem interna */
+  max-height: 60vh;
   border-radius: 10px;
 }
 .table thead th {
@@ -167,10 +155,6 @@ body {
   white-space: nowrap;
 }
 
-/* ===================================================================
-   HAMBÚRGUER + DRAWER (MOBILE)
-=================================================================== */
-/* botão (escondido no desktop, mostrado no mobile) */
 .hamburger {
   display: none;
   border: 1px solid var(--color-border);
@@ -205,7 +189,6 @@ body {
   top: 6px;
 }
 
-/* Drawer */
 @media (max-width: 1024px) {
   .hamburger {
     display: inline-flex;
@@ -239,11 +222,8 @@ body {
     opacity: 1;
     pointer-events: auto;
   }
-
-  /* a estrutura geral continua 2 colunas no desktop; no mobile só o conteúdo é visto. */
 }
 
-/* densidade levemente mais compacta em janelas estreitas */
 @media (max-width: 1100px) {
   .sidebar-header {
     padding: var(--space-3);
@@ -264,7 +244,6 @@ body {
   }
 }
 
-/* altura baixa: mantém footer visível */
 @media (max-height: 700px) {
   .sidebar {
     padding-bottom: 1rem;
@@ -276,33 +255,25 @@ body {
     border-top: 1px solid var(--color-border);
   }
 }
-
-/* --- Corrige o scroll travado --- */
-
-/* Permite scroll global na área principal */
 body {
-  overflow-y: auto; /* volta o scroll normal */
+  overflow-y: auto;
 }
 
-/* App ocupa altura total, mas não impede scroll interno */
 .app {
   min-height: 100vh;
-  height: auto; /* antes podia estar fixo a 100vh */
+  height: auto;
 }
 
-/* O conteúdo pode rolar naturalmente */
 .main {
   height: auto;
   overflow: visible;
 }
 
-/* Mas se quiser que apenas a área de conteúdo role dentro do painel (sem mover o header) */
 .content {
-  overflow-y: auto; /* cria o scroll dentro da área principal */
-  max-height: calc(100vh - 70px); /* 70px ≈ altura da topbar */
+  overflow-y: auto;
+  max-height: calc(100vh - 70px);
 }
 
-/* No mobile, deixa o conteúdo rolar total (sem cortar nada) */
 @media (max-width: 1024px) {
   .content {
     max-height: none;

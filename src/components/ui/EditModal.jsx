@@ -1,15 +1,5 @@
 import Modal from "./Modal";
 
-/**
- * Modal genérico para formulários de edição
- *
- * Props:
- * - open (bool)
- * - onClose (function)
- * - title (string)
- * - onSubmit (function)
- * - children (form fields)
- */
 export default function EditModal({
   open,
   onClose,
