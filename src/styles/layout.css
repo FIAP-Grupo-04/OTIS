@@ -1,28 +1,51 @@
-/* ============ LAYOUT BASE (AppShell) ============ */
+/* ===================================================================
+   BASE
+=================================================================== */
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden; /* scroll só no conteúdo */
+}
+
+/* ===================================================================
+   APP SHELL - estrutura principal
+   .app = linha (sidebar + main)
+   .main = coluna (topbar + content)
+=================================================================== */
 .app {
   display: flex;
   min-height: 100vh;
   background: var(--color-bg);
-  color: var(--color-text);
 }
 
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-/* ============ SIDEBAR ============ */
 .sidebar {
-  width: 220px;
+  width: clamp(168px, 18vw, 220px);
   height: 100vh;
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
+  box-shadow: var(--shadow);
+
+  /* organização interna */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: var(--shadow);
+  padding-top: 16px;
+  padding-bottom: 8px;
+  overflow-y: auto; /* se faltar altura, rola no próprio menu */
+}
+
+/* topo (logo + navegação) */
+.sidebar > div:first-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .sidebar-header {
@@ -32,13 +55,15 @@
   color: var(--color-primary-ink);
 }
 
+/* links */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
-  padding: 0 var(--space-3);
+  padding: 0 12px;
+  margin-top: 12px;
 }
-
 .sidebar-nav a {
   display: flex;
   align-items: center;
@@ -46,9 +71,9 @@
   padding: 10px 12px;
   border-radius: var(--radius);
   color: var(--color-text);
+  text-decoration: none;
   transition: background 0.15s, color 0.15s;
 }
-
 .sidebar-nav a.active,
 .sidebar-nav a:hover {
   background: var(--color-blue-soft);
@@ -56,26 +81,169 @@
   font-weight: 600;
 }
 
+/* rodapé (Sair ancorado embaixo) */
 .sidebar-footer {
-  padding: var(--space-3);
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--color-border);
+  text-align: left;
   font-size: 0.85rem;
   color: var(--color-muted);
-  border-top: 1px solid var(--color-border);
+}
+.sidebar-footer button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: #ef4444;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-/* ===== SIDEBAR - Comportamento Estável ===== */
-
-/* Largura fluida: entre 168px e 220px, conforme o espaço */
-:root {
-  --sidebar-max: 220px;
-  --sidebar-min: 168px;
-}
-.sidebar {
-  width: clamp(var(--sidebar-min), 18vw, var(--sidebar-max));
-  overflow-y: auto; /* se faltar altura, rola */
+/* coluna principal (topo + conteúdo) */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* evita overflow horizontal */
 }
 
-/* Ajustes leves de densidade quando a janela estreita */
+/* topo */
+.topbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* conteúdo que rola */
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow: auto; /* rolagem só aqui */
+}
+
+/* ===================================================================
+   SEÇÕES / PAINÉIS
+=================================================================== */
+.section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 18px 22px;
+  margin-bottom: 20px;
+}
+.section h2 {
+  margin: 0 0 6px;
+  font-size: 1.3rem;
+}
+.section p.subtitle {
+  margin: 0 0 18px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+/* ===================================================================
+   TABELAS (sticky header + scroll quando necessário)
+=================================================================== */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 60vh; /* vira rolagem interna */
+  border-radius: 10px;
+}
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-surface);
+  box-shadow: inset 0 -1px 0 #d1d5db, 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.table th,
+.table td {
+  white-space: nowrap;
+}
+
+/* ===================================================================
+   HAMBÚRGUER + DRAWER (MOBILE)
+=================================================================== */
+/* botão (escondido no desktop, mostrado no mobile) */
+.hamburger {
+  display: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #111827;
+  position: relative;
+}
+.hamburger span::before,
+.hamburger span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 18px;
+  height: 2px;
+  background: #111827;
+}
+.hamburger span::before {
+  top: -6px;
+}
+.hamburger span::after {
+  top: 6px;
+}
+
+/* Drawer */
+@media (max-width: 1024px) {
+  .hamburger {
+    display: inline-flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 30;
+  }
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 20;
+  }
+  .sidebar-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* a estrutura geral continua 2 colunas no desktop; no mobile só o conteúdo é visto. */
+}
+
+/* densidade levemente mais compacta em janelas estreitas */
 @media (max-width: 1100px) {
   .sidebar-header {
     padding: var(--space-3);
@@ -96,10 +264,9 @@
   }
 }
 
-/* Altura baixa: rolagem interna; footer sempre visível opcional */
+/* altura baixa: mantém footer visível */
 @media (max-height: 700px) {
   .sidebar {
-    overflow-y: auto;
     padding-bottom: 1rem;
   }
   .sidebar-footer {
@@ -110,85 +277,35 @@
   }
 }
 
-/* >>> SUBSTITUI o bloco antigo que virava "topbar" <<< */
-@media (max-width: 900px) {
-  /* mantém layout em linha (sidebar + conteúdo) */
-  .app {
-    flex-direction: row !important;
-  }
+/* --- Corrige o scroll travado --- */
 
-  /* sidebar continua lateral, só fica um pouco mais compacta */
-  .sidebar {
-    width: 180px !important;
-    height: auto;
-    min-height: 100vh;
-    overflow-y: auto;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    border-right: 1px solid var(--color-border) !important;
-    border-bottom: 0 !important;
-  }
+/* Permite scroll global na área principal */
+body {
+  overflow-y: auto; /* volta o scroll normal */
 }
 
-/* ============ TOPBAR ============ */
-.topbar {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  padding: 14px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* App ocupa altura total, mas não impede scroll interno */
+.app {
+  min-height: 100vh;
+  height: auto; /* antes podia estar fixo a 100vh */
 }
 
-.topbar-user {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  font-size: 0.9rem;
-  color: var(--color-muted);
+/* O conteúdo pode rolar naturalmente */
+.main {
+  height: auto;
+  overflow: visible;
 }
 
-.topbar-user strong {
-  color: var(--color-primary-ink);
-  font-weight: 600;
-}
-
-/* ============ CONTEÚDO ============ */
+/* Mas se quiser que apenas a área de conteúdo role dentro do painel (sem mover o header) */
 .content {
-  flex: 1;
-  padding: 24px;
-  overflow-x: hidden;
+  overflow-y: auto; /* cria o scroll dentro da área principal */
+  max-height: calc(100vh - 70px); /* 70px ≈ altura da topbar */
 }
 
-.section {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  padding: 18px 22px;
-  margin-bottom: 20px;
-}
-
-.section h2 {
-  margin: 0 0 6px;
-  font-size: 1.3rem;
-}
-
-.section p.subtitle {
-  margin: 0 0 18px;
-  color: var(--color-muted);
-  font-size: 0.9rem;
-}
-
-@media (max-width: 900px) {
-  .app {
-    flex-direction: column;
-  }
-  .sidebar {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-around;
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
+/* No mobile, deixa o conteúdo rolar total (sem cortar nada) */
+@media (max-width: 1024px) {
+  .content {
+    max-height: none;
+    overflow-y: visible;
   }
 }

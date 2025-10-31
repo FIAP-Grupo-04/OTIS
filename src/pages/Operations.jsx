@@ -1,261 +1,421 @@
-import { useEffect, useMemo, useState } from "react";
-import { getClients } from "../services/clientsService";
-import { getElevatorsSeed } from "../services/elevatorsService";
-import {
-  getOperationTypes,
-  getTechnicians,
-  getOperationsSeed,
-} from "../services/operationsService";
+// src/pages/Operations.jsx
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Section from "../components/ui/Section";
 import Field from "../components/forms/Field";
-import Select from "../components/forms/Select";
 import Input from "../components/ui/Input";
+import Select from "../components/forms/Select";
 import EditModal from "../components/ui/EditModal";
 import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
-import { dateBR } from "../utils/formatters";
 import { validateRequired } from "../utils/validators";
+import { dateBR } from "../utils/formatters";
+
+import { getClients, onClientsChange } from "../services/clientsService";
+import { getElevators, onElevatorsChange } from "../services/elevatorsService";
+import {
+  getOperations,
+  createOperation,
+  updateOperation,
+  removeOperation,
+  onOperationsChange,
+} from "../services/operationsService";
+
+// Captura valor de <select> nativo e do Select custom
+const pickValue = (evOrVal) => {
+  if (evOrVal && evOrVal.target) return evOrVal.target.value;
+  if (typeof evOrVal === "object" && evOrVal !== null) {
+    return evOrVal.id ?? evOrVal.value ?? "";
+  }
+  return evOrVal ?? "";
+};
+
+// Normaliza objeto para validação (string + trim)
+const normalize = (obj) =>
+  Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [
+      k,
+      typeof v === "string" ? v.trim() : v ?? "",
+    ])
+  );
+
+const countryOptions = [
+  "Argentina",
+  "Bolívia",
+  "Brasil",
+  "Chile",
+  "Colômbia",
+  "Costa Rica",
+  "Cuba",
+  "Equador",
+  "El Salvador",
+  "Guatemala",
+  "Honduras",
+  "México",
+  "Nicarágua",
+  "Panamá",
+  "Paraguai",
+  "Peru",
+  "Porto Rico",
+  "República Dominicana",
+  "Uruguai",
+  "Venezuela",
+  "Belize",
+  "Guiana",
+  "Suriname",
+];
 
 export default function Operations() {
   const [clients, setClients] = useState([]);
   const [elevators, setElevators] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [techs, setTechs] = useState([]);
-
-  const [seedOps, setSeedOps] = useState([]);
-  const [localOps, setLocalOps] = useState(() =>
-    JSON.parse(localStorage.getItem("operations") || "[]")
-  );
-  const [deletedIds, setDeletedIds] = useState(() =>
-    JSON.parse(localStorage.getItem("operations_deleted") || "[]")
-  );
+  const [ops, setOps] = useState([]);
 
   const [q, setQ] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("");
+  const [paisFiltro, setPaisFiltro] = useState("");
+
+  // flags para não sobrescrever quando o usuário digitar manualmente
+  const [valorTouched, setValorTouched] = useState(false);
+  const [valorTouchedEdit, setValorTouchedEdit] = useState(false);
+  const [addrTouched, setAddrTouched] = useState(false);
+  const [addrTouchedEdit, setAddrTouchedEdit] = useState(false);
 
   const [form, setForm] = useState({
-    tipoId: "",
-    status: "Aberta",
+    tipoOperacao: "Instalação",
+    status: "Em Negociação",
     prioridade: "Média",
     clienteId: "",
     elevadorId: "",
-    responsavelId: "",
+    responsavelTecnico: "",
     dataAbertura: new Date().toISOString().slice(0, 10),
     dataLimite: "",
+    valor: "",
+    pais: "Brasil",
+    enderecoEntrega: "", // 👈 novo campo
     descricao: "",
   });
   const [errors, setErrors] = useState({});
 
+  // edit/delete
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [toDelete, setToDelete] = useState(null);
 
-  useEffect(() => {
-    Promise.all([
+  const reload = useCallback(async () => {
+    const [c, e, o] = await Promise.all([
       getClients(),
-      getElevatorsSeed(),
-      getOperationTypes(),
-      getTechnicians(),
-      getOperationsSeed(),
-    ])
-      .then(([c, e, t, tech, ops]) => {
-        setClients(c || []);
-        setElevators(Array.isArray(e) ? e : []);
-        setTypes(t || []);
-        setTechs(tech || []);
-        setSeedOps(Array.isArray(ops) ? ops : []);
-      })
-      .catch(() => {});
+      getElevators(),
+      getOperations(),
+    ]);
+    setClients(c || []);
+    setElevators(e || []);
+    setOps(o || []);
   }, []);
 
-  const lista = useMemo(() => {
-    const byId = new Map();
-    for (const o of seedOps) byId.set(o.id, o);
-    for (const o of localOps) byId.set(o.id, o);
-    const merged = Array.from(byId.values()).filter(
-      (o) => !deletedIds.includes(o.id)
-    );
-
-    const term = q.trim().toLowerCase();
-    return merged.filter((op) => {
-      const okStatus = !statusFiltro || op.status === statusFiltro;
-      const hay = [
-        op.id,
-        op.descricao,
-        clients.find((c) => c.id === op.clienteId)?.nome ?? "",
-        op.elevadorId ?? "",
-        types.find((t) => t.id === op.tipoId)?.nome ?? "",
-        techs.find((t) => t.id === op.responsavelId)?.nome ?? "",
-      ]
-        .join(" ")
-        .toLowerCase();
-      return okStatus && (!term || hay.includes(term));
-    });
-  }, [seedOps, localOps, deletedIds, q, statusFiltro, clients, types, techs]);
+  useEffect(() => {
+    reload();
+    const unsubC = onClientsChange(reload);
+    const unsubE = onElevatorsChange(reload);
+    const unsubO = onOperationsChange(reload);
+    return () => {
+      unsubC?.();
+      unsubE?.();
+      unsubO?.();
+    };
+  }, [reload]);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const setEditField = (k, v) => setEditForm((f) => ({ ...f, [k]: v }));
 
-  // CADASTRAR
-  function handleSubmit(e) {
+  // helpers de nome
+  const productName = (id) => elevators.find((e) => e.id === id)?.modelo || "-";
+  const clientName = (id) => clients.find((c) => c.id === id)?.nome || id;
+
+  // ======= Autopreencher VALOR pelo produto (cadastro) =======
+  useEffect(() => {
+    if (!form.elevadorId || valorTouched) return;
+    const ev = elevators.find((x) => x.id === form.elevadorId);
+    if (ev && ev.preco != null)
+      setForm((f) => ({ ...f, valor: String(ev.preco) }));
+  }, [form.elevadorId, elevators, valorTouched]);
+
+  // ======= Autopreencher ENDEREÇO pelo cliente (cadastro) =======
+  useEffect(() => {
+    if (!form.clienteId || addrTouched) return;
+    const c = clients.find((x) => x.id === form.clienteId);
+    if (c?.endereco) setForm((f) => ({ ...f, enderecoEntrega: c.endereco }));
+  }, [form.clienteId, clients, addrTouched]);
+
+  // ======= mesmos comportamentos no modal de edição =======
+  useEffect(() => {
+    if (!editOpen || !editForm.elevadorId || valorTouchedEdit) return;
+    const ev = elevators.find((x) => x.id === editForm.elevadorId);
+    if (ev?.preco != null)
+      setEditForm((f) => ({ ...f, valor: String(ev.preco) }));
+  }, [editOpen, editForm.elevadorId, elevators, valorTouchedEdit]);
+
+  useEffect(() => {
+    if (!editOpen || !editForm.clienteId || addrTouchedEdit) return;
+    const c = clients.find((x) => x.id === editForm.clienteId);
+    if (c?.endereco)
+      setEditForm((f) => ({ ...f, enderecoEntrega: c.endereco }));
+  }, [editOpen, editForm.clienteId, clients, addrTouchedEdit]);
+
+  const tipoOptions = [
+    { id: "Instalação", nome: "Instalação" },
+    { id: "Manutenção", nome: "Manutenção" },
+    { id: "Inspeção", nome: "Inspeção" },
+  ];
+  const statusOptions = [
+    { id: "Em Negociação", nome: "Em Negociação" },
+    { id: "Em Andamento", nome: "Em Andamento" },
+    { id: "Aguardando Peças", nome: "Aguardando Peças" },
+    { id: "Concluída", nome: "Concluída" },
+  ];
+  const priorOptions = [
+    { id: "Alta", nome: "Alta" },
+    { id: "Média", nome: "Média" },
+    { id: "Baixa", nome: "Baixa" },
+  ];
+
+  // ======= CADASTRAR =======
+  async function handleSubmit(e) {
     e.preventDefault();
+
+    const norm = normalize(form);
     const req = validateRequired(
       [
-        "tipoId",
+        "tipoOperacao",
+        "status",
+        "prioridade",
         "clienteId",
-        "responsavelId",
+        "elevadorId",
+        "responsavelTecnico",
         "dataAbertura",
         "dataLimite",
-        "descricao",
+        // "pais",
+        // "enderecoEntrega", // 👈 descomente se quiser obrigatório
       ],
-      form
+      norm
     );
     setErrors(req);
     if (Object.keys(req).length) return;
 
-    const novo = { id: "OP-" + String(Date.now()).slice(-6), ...form };
-    const next = [...localOps, novo];
-    setLocalOps(next);
-    localStorage.setItem("operations", JSON.stringify(next));
+    await createOperation({
+      ...norm,
+      valor: norm.valor ? Number(norm.valor) : 0,
+    });
+    await reload();
+
     setForm({
-      tipoId: "",
-      status: "Aberta",
+      tipoOperacao: "Instalação",
+      status: "Em Negociação",
       prioridade: "Média",
       clienteId: "",
       elevadorId: "",
-      responsavelId: "",
+      responsavelTecnico: "",
       dataAbertura: new Date().toISOString().slice(0, 10),
       dataLimite: "",
+      valor: "",
+      pais: "Brasil",
+      enderecoEntrega: "",
       descricao: "",
     });
+    setValorTouched(false);
+    setAddrTouched(false);
     setErrors({});
   }
 
-  // EDITAR
+  // ======= EDITAR =======
   function openEdit(item) {
-    setEditForm({ ...item });
+    const cliente = clients.find((c) => c.id === item.clienteId);
+    setEditForm({
+      ...item,
+      pais: item.pais || "Brasil",
+      enderecoEntrega: item.enderecoEntrega || cliente?.endereco || "",
+    });
+    setValorTouchedEdit(false);
+    setAddrTouchedEdit(false);
     setEditOpen(true);
   }
-  function saveEdit(e) {
+
+  async function saveEdit(e) {
     e.preventDefault();
+    const norm = normalize(editForm);
     const req = validateRequired(
       [
-        "tipoId",
+        "tipoOperacao",
+        "status",
+        "prioridade",
         "clienteId",
-        "responsavelId",
+        "elevadorId",
+        "responsavelTecnico",
         "dataAbertura",
         "dataLimite",
-        "descricao",
+        // "pais",
+        // "enderecoEntrega", // 👈 descomente se quiser obrigatório
       ],
-      editForm
+      norm
     );
     if (Object.keys(req).length) {
       alert("Preencha os campos obrigatórios.");
       return;
     }
-
-    const updated = { ...editForm };
-    const existsLocal = localOps.some((o) => o.id === updated.id);
-    const next = existsLocal
-      ? localOps.map((o) => (o.id === updated.id ? updated : o))
-      : [...localOps, updated];
-    setLocalOps(next);
-    localStorage.setItem("operations", JSON.stringify(next));
+    await updateOperation({
+      ...norm,
+      valor: norm.valor ? Number(norm.valor) : 0,
+    });
+    await reload();
     setEditOpen(false);
   }
 
-  // EXCLUIR
+  // ======= EXCLUIR =======
   function requestDelete(item) {
     setToDelete(item);
     setConfirmOpen(true);
   }
-  function confirmDelete() {
-    const id = toDelete?.id;
-    if (!id) return;
-
-    if (localOps.some((o) => o.id === id)) {
-      const next = localOps.filter((o) => o.id !== id);
-      setLocalOps(next);
-      localStorage.setItem("operations", JSON.stringify(next));
-    } else {
-      const nextDel = [...new Set([...(deletedIds || []), id])];
-      setDeletedIds(nextDel);
-      localStorage.setItem("operations_deleted", JSON.stringify(nextDel));
-    }
-
+  async function confirmDelete() {
+    if (toDelete?.id) await removeOperation(toDelete.id);
+    await reload();
     setConfirmOpen(false);
     setToDelete(null);
   }
+
+  // lista mostrada (inclui endereçoEntrega e filtros)
+  const lista = useMemo(() => {
+    const term = (q || "").trim().toLowerCase();
+    const base = Array.isArray(ops) ? ops : [];
+    return base.filter((op) => {
+      const okStatus = !statusFiltro || op.status === statusFiltro;
+      const okPais = !paisFiltro || (op.pais || "") === paisFiltro;
+      if (!term) return okStatus && okPais;
+
+      const hay = [
+        op.id,
+        op.tipoOperacao,
+        op.descricao,
+        op.pais,
+        op.enderecoEntrega,
+        clientName(op.clienteId),
+        productName(op.elevadorId),
+        op.responsavelTecnico,
+        op.status,
+        op.prioridade,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return okStatus && okPais && hay.includes(term);
+    });
+  }, [ops, q, statusFiltro, paisFiltro, clients, elevators]);
+
+  const badgeStatus = (s) =>
+    /Conclu/i.test(s)
+      ? "b-green"
+      : /Andamento/i.test(s)
+      ? "b-blue"
+      : /Aguard/i.test(s)
+      ? "b-yellow"
+      : "b-orange";
+  const badgePrior = (p) =>
+    /Alta/i.test(p) ? "b-orange" : /M[eé]dia/i.test(p) ? "b-blue" : "b-green";
 
   return (
     <>
       <Section
         title="Cadastro de Operações"
-        subtitle="Instalações, manutenções e inspeções."
+        subtitle="Instalação, Manutenção e Inspeção."
       >
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
-            <Field label="Tipo" error={errors.tipoId}>
+            <Field label="Tipo de Operação" error={errors.tipoOperacao}>
               <Select
-                value={form.tipoId}
-                onChange={(e) => setField("tipoId", e.target.value)}
-                options={types}
-                placeholder="Selecione o tipo"
+                value={form.tipoOperacao}
+                onChange={(v) => setField("tipoOperacao", pickValue(v))}
+                options={tipoOptions}
               />
             </Field>
-            <Field label="Status">
+
+            <Field label="Status" error={errors.status}>
               <Select
                 value={form.status}
-                onChange={(e) => setField("status", e.target.value)}
-                options={[
-                  { id: "Aberta", nome: "Aberta" },
-                  { id: "Em Andamento", nome: "Em Andamento" },
-                  { id: "Aguardando Peças", nome: "Aguardando Peças" },
-                  { id: "Concluída", nome: "Concluída" },
-                ]}
+                onChange={(v) => setField("status", pickValue(v))}
+                options={statusOptions}
               />
             </Field>
-            <Field label="Prioridade">
+
+            <Field label="Prioridade" error={errors.prioridade}>
               <Select
                 value={form.prioridade}
-                onChange={(e) => setField("prioridade", e.target.value)}
-                options={[
-                  { id: "Alta", nome: "Alta" },
-                  { id: "Média", nome: "Média" },
-                  { id: "Baixa", nome: "Baixa" },
-                ]}
+                onChange={(v) => setField("prioridade", pickValue(v))}
+                options={priorOptions}
               />
             </Field>
+
             <Field label="Cliente" error={errors.clienteId}>
               <Select
                 value={form.clienteId}
-                onChange={(e) => setField("clienteId", e.target.value)}
+                onChange={(v) => {
+                  setField("clienteId", pickValue(v));
+                  // endereço puxa do cliente, mas só se o usuário ainda não digitou nada
+                  if (!addrTouched) {
+                    const cli = clients.find((c) => c.id === pickValue(v));
+                    if (cli?.endereco)
+                      setField("enderecoEntrega", cli.endereco);
+                  }
+                }}
                 options={clients}
                 placeholder="Selecione o cliente"
               />
             </Field>
-            <Field label="Elevador (opcional)">
+
+            {/* PRODUTO */}
+            <Field label="Produto" error={errors.elevadorId}>
               <select
                 className="input"
                 value={form.elevadorId}
-                onChange={(e) => setField("elevadorId", e.target.value)}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setField("elevadorId", id);
+                  if (!valorTouched) {
+                    const ev = elevators.find((x) => x.id === id);
+                    if (ev?.preco != null) setField("valor", String(ev.preco));
+                  }
+                }}
               >
-                <option value="">Sem vínculo</option>
+                <option value="">Selecione um produto</option>
                 {elevators.map((ev) => (
                   <option key={ev.id} value={ev.id}>
-                    {ev.id} — {ev.modelo}
+                    {ev.modelo}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field label="Responsável" error={errors.responsavelId}>
-              <Select
-                value={form.responsavelId}
-                onChange={(e) => setField("responsavelId", e.target.value)}
-                options={techs}
-                placeholder="Selecione o técnico"
+
+            <Field
+              label="Responsável Técnico"
+              error={errors.responsavelTecnico}
+            >
+              <Input
+                value={form.responsavelTecnico}
+                onChange={(e) => setField("responsavelTecnico", e.target.value)}
               />
             </Field>
+
+            <Field label="País">
+              <select
+                className="input"
+                value={form.pais}
+                onChange={(e) => setField("pais", e.target.value)}
+              >
+                {countryOptions.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
             <Field label="Abertura" error={errors.dataAbertura}>
               <Input
                 type="date"
@@ -263,6 +423,7 @@ export default function Operations() {
                 onChange={(e) => setField("dataAbertura", e.target.value)}
               />
             </Field>
+
             <Field label="Prazo" error={errors.dataLimite}>
               <Input
                 type="date"
@@ -270,17 +431,77 @@ export default function Operations() {
                 onChange={(e) => setField("dataLimite", e.target.value)}
               />
             </Field>
-            <Field label="Descrição" error={errors.descricao}>
-              <textarea
-                className="input"
-                rows={3}
-                value={form.descricao}
-                onChange={(e) => setField("descricao", e.target.value)}
+
+            <Field label="Valor (R$)">
+              <Input
+                type="number"
+                value={form.valor}
+                onChange={(e) => {
+                  setValorTouched(true);
+                  setField("valor", e.target.value);
+                }}
               />
             </Field>
+
+            {/* ENDEREÇO DE ENTREGA */}
+            <div className="col-span-2">
+              <Field label="Endereço de Entrega">
+                <textarea
+                  className="input input-textarea"
+                  rows={3}
+                  maxLength={200}
+                  value={form.enderecoEntrega}
+                  onChange={(e) => {
+                    setAddrTouched(true);
+                    setField("enderecoEntrega", e.target.value);
+                  }}
+                  placeholder="Rua, número, bairro, cidade, UF, CEP"
+                />
+              </Field>
+            </div>
+
+            <div className="col-span-2">
+              <Field label="Descrição (opcional)">
+                <textarea
+                  className="input input-textarea"
+                  rows={4}
+                  maxLength={150}
+                  value={form.descricao}
+                  onChange={(e) => setField("descricao", e.target.value)}
+                />
+                <div className="char-counter">
+                  {(form.descricao || "").length}/150
+                </div>
+              </Field>
+            </div>
           </div>
 
           <div className="actions">
+            <button
+              className="btn ghost"
+              type="reset"
+              onClick={() => {
+                setForm({
+                  tipoOperacao: "Instalação",
+                  status: "Em Negociação",
+                  prioridade: "Média",
+                  clienteId: "",
+                  elevadorId: "",
+                  responsavelTecnico: "",
+                  dataAbertura: new Date().toISOString().slice(0, 10),
+                  dataLimite: "",
+                  valor: "",
+                  pais: "Brasil",
+                  enderecoEntrega: "",
+                  descricao: "",
+                });
+                setValorTouched(false);
+                setAddrTouched(false);
+                setErrors({});
+              }}
+            >
+              Limpar
+            </button>
             <button className="btn primary" type="submit">
               Salvar
             </button>
@@ -288,7 +509,7 @@ export default function Operations() {
         </form>
       </Section>
 
-      <Section title="Operações" subtitle="Base pública + novos registros.">
+      <Section title="Operações" subtitle="Seed + alterações locais.">
         <div
           style={{
             display: "flex",
@@ -300,7 +521,7 @@ export default function Operations() {
           <div style={{ display: "flex", gap: 12 }}>
             <input
               className="input"
-              style={{ maxWidth: 280 }}
+              style={{ maxWidth: 240 }}
               placeholder="Buscar…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -311,10 +532,23 @@ export default function Operations() {
               onChange={(e) => setStatusFiltro(e.target.value)}
             >
               <option value="">Todos os status</option>
-              <option>Aberta</option>
-              <option>Em Andamento</option>
-              <option>Aguardando Peças</option>
-              <option>Concluída</option>
+              {statusOptions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.nome}
+                </option>
+              ))}
+            </select>
+            <select
+              className="input"
+              value={paisFiltro}
+              onChange={(e) => setPaisFiltro(e.target.value)}
+            >
+              <option value="">Todos os países</option>
+              {countryOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
           </div>
           <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
@@ -322,148 +556,227 @@ export default function Operations() {
           </div>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th style={{ width: 70 }}>Ações</th>
-              <th>Código</th>
-              <th>Tipo</th>
-              <th>Status</th>
-              <th>Prioridade</th>
-              <th>Cliente</th>
-              <th>Elevador</th>
-              <th>Responsável</th>
-              <th>Abertura</th>
-              <th>Prazo</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lista.map((op) => (
-              <tr key={op.id}>
-                <td>
-                  <div className="row-actions">
-                    <button
-                      className="icon-btn"
-                      title="Editar"
-                      onClick={() => openEdit(op)}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="icon-btn danger"
-                      title="Excluir"
-                      onClick={() => requestDelete(op)}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-                <td>{op.id}</td>
-                <td>{types.find((t) => t.id === op.tipoId)?.nome ?? ""}</td>
-                <td>{op.status}</td>
-                <td>{op.prioridade}</td>
-                <td>
-                  {clients.find((c) => c.id === op.clienteId)?.nome ?? ""}
-                </td>
-                <td>{op.elevadorId || "-"}</td>
-                <td>
-                  {techs.find((t) => t.id === op.responsavelId)?.nome ?? ""}
-                </td>
-                <td>{dateBR(op.dataAbertura)}</td>
-                <td>{dateBR(op.dataLimite)}</td>
+        <div className="table-scroll">
+          <table className="table">
+            <thead>
+              <tr>
+                <th style={{ width: 70 }}>Ações</th>
+                <th>Código</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Prioridade</th>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Responsável Técnico</th>
+                <th>Abertura</th>
+                <th>Prazo</th>
+                <th>País</th>
+                <th>Endereço de Entrega</th>
+                <th>Descrição</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {lista.map((op) => (
+                <tr key={op.id}>
+                  <td>
+                    <div className="row-actions">
+                      <button
+                        className="icon-btn"
+                        title="Editar"
+                        onClick={() => openEdit(op)}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="icon-btn danger"
+                        title="Excluir"
+                        onClick={() => requestDelete(op)}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                  <td>{op.id}</td>
+                  <td>{op.tipoOperacao}</td>
+                  <td>
+                    <span className={`badge ${badgeStatus(op.status)}`}>
+                      {op.status}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`badge ${badgePrior(op.prioridade)}`}>
+                      {op.prioridade}
+                    </span>
+                  </td>
+                  <td>{clientName(op.clienteId)}</td>
+                  <td>{productName(op.elevadorId)}</td>
+                  <td>{op.responsavelTecnico || "-"}</td>
+                  <td>{dateBR(op.dataAbertura)}</td>
+                  <td>{dateBR(op.dataLimite)}</td>
+                  <td>{op.pais || "-"}</td>
+                  <td>{op.enderecoEntrega || "-"}</td>
+                  <td>{op.descricao || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Section>
 
-      {/* MODAIS */}
+      {/* MODAL EDIÇÃO */}
       <EditModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
         title={`Editar Operação — ${editForm.id || ""}`}
         onSubmit={saveEdit}
       >
-        <Field label="Tipo">
-          <Select
-            value={editForm.tipoId || ""}
-            onChange={(e) => setEditField("tipoId", e.target.value)}
-            options={types}
-          />
-        </Field>
-        <Field label="Status">
-          <Select
-            value={editForm.status || "Aberta"}
-            onChange={(e) => setEditField("status", e.target.value)}
-            options={[
-              { id: "Aberta", nome: "Aberta" },
-              { id: "Em Andamento", nome: "Em Andamento" },
-              { id: "Aguardando Peças", nome: "Aguardando Peças" },
-              { id: "Concluída", nome: "Concluída" },
-            ]}
-          />
-        </Field>
-        <Field label="Prioridade">
-          <Select
-            value={editForm.prioridade || "Média"}
-            onChange={(e) => setEditField("prioridade", e.target.value)}
-            options={[
-              { id: "Alta", nome: "Alta" },
-              { id: "Média", nome: "Média" },
-              { id: "Baixa", nome: "Baixa" },
-            ]}
-          />
-        </Field>
-        <Field label="Cliente">
-          <Select
-            value={editForm.clienteId || ""}
-            onChange={(e) => setEditField("clienteId", e.target.value)}
-            options={clients}
-          />
-        </Field>
-        <Field label="Elevador">
-          <select
-            className="input"
-            value={editForm.elevadorId || ""}
-            onChange={(e) => setEditField("elevadorId", e.target.value)}
-          >
-            <option value="">Sem vínculo</option>
-            {elevators.map((ev) => (
-              <option key={ev.id} value={ev.id}>
-                {ev.id} — {ev.modelo}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Responsável">
-          <Select
-            value={editForm.responsavelId || ""}
-            onChange={(e) => setEditField("responsavelId", e.target.value)}
-            options={techs}
-          />
-        </Field>
-        <Field label="Abertura">
-          <Input
-            type="date"
-            value={editForm.dataAbertura || ""}
-            onChange={(e) => setEditField("dataAbertura", e.target.value)}
-          />
-        </Field>
-        <Field label="Prazo">
-          <Input
-            type="date"
-            value={editForm.dataLimite || ""}
-            onChange={(e) => setEditField("dataLimite", e.target.value)}
-          />
-        </Field>
-        <Field label="Descrição">
-          <textarea
-            className="input"
-            rows={3}
-            value={editForm.descricao || ""}
-            onChange={(e) => setEditField("descricao", e.target.value)}
-          />
-        </Field>
+        <div className="form-grid">
+          <Field label="Tipo de Operação">
+            <Select
+              value={editForm.tipoOperacao || ""}
+              onChange={(v) => setEditField("tipoOperacao", pickValue(v))}
+              options={tipoOptions}
+            />
+          </Field>
+
+          <Field label="Status">
+            <Select
+              value={editForm.status || "Em Negociação"}
+              onChange={(v) => setEditField("status", pickValue(v))}
+              options={statusOptions}
+            />
+          </Field>
+
+          <Field label="Prioridade">
+            <Select
+              value={editForm.prioridade || "Média"}
+              onChange={(v) => setEditField("prioridade", pickValue(v))}
+              options={priorOptions}
+            />
+          </Field>
+
+          <Field label="Cliente">
+            <Select
+              value={editForm.clienteId || ""}
+              onChange={(v) => {
+                const id = pickValue(v);
+                setEditField("clienteId", id);
+                if (!addrTouchedEdit) {
+                  const cli = clients.find((c) => c.id === id);
+                  if (cli?.endereco)
+                    setEditField("enderecoEntrega", cli.endereco);
+                }
+              }}
+              options={clients}
+            />
+          </Field>
+
+          <Field label="Produto">
+            <select
+              className="input"
+              value={editForm.elevadorId || ""}
+              onChange={(e) => {
+                const id = e.target.value;
+                setEditField("elevadorId", id);
+                if (!valorTouchedEdit) {
+                  const ev = elevators.find((x) => x.id === id);
+                  if (ev?.preco != null)
+                    setEditField("valor", String(ev.preco));
+                }
+              }}
+            >
+              <option value="">Selecione um produto</option>
+              {elevators.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.modelo}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="País">
+            <select
+              className="input"
+              value={editForm.pais || "Brasil"}
+              onChange={(e) => setEditField("pais", e.target.value)}
+            >
+              {countryOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Responsável Técnico">
+            <Input
+              value={editForm.responsavelTecnico || ""}
+              onChange={(e) =>
+                setEditField("responsavelTecnico", e.target.value)
+              }
+            />
+          </Field>
+
+          <Field label="Abertura">
+            <Input
+              type="date"
+              value={editForm.dataAbertura || ""}
+              onChange={(e) => setEditField("dataAbertura", e.target.value)}
+            />
+          </Field>
+
+          <Field label="Prazo">
+            <Input
+              type="date"
+              value={editForm.dataLimite || ""}
+              onChange={(e) => setEditField("dataLimite", e.target.value)}
+            />
+          </Field>
+
+          <Field label="Valor (R$)">
+            <Input
+              type="number"
+              value={editForm.valor ?? ""}
+              onChange={(e) => {
+                setValorTouchedEdit(true);
+                setEditField("valor", e.target.value);
+              }}
+            />
+          </Field>
+
+          {/* ENDEREÇO DE ENTREGA no modal (ocupando 2 colunas) */}
+          <div className="col-span-2">
+            <Field label="Endereço de Entrega">
+              <textarea
+                className="input input-textarea"
+                rows={3}
+                maxLength={200}
+                value={editForm.enderecoEntrega || ""}
+                onChange={(e) => {
+                  setAddrTouchedEdit(true);
+                  setEditField("enderecoEntrega", e.target.value);
+                }}
+                placeholder="Rua, número, bairro, cidade, UF, CEP"
+              />
+            </Field>
+          </div>
+
+          {/* Descrição já ocupando 2 colunas */}
+          <div className="col-span-2">
+            <Field label="Descrição (opcional)">
+              <textarea
+                className="input input-textarea"
+                rows={4}
+                maxLength={150}
+                value={editForm.descricao || ""}
+                onChange={(e) => setEditField("descricao", e.target.value)}
+              />
+              <div className="char-counter">
+                {(editForm.descricao || "").length}/150
+              </div>
+            </Field>
+          </div>
+        </div>
       </EditModal>
 
       <ConfirmDeleteModal

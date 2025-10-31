@@ -1,202 +1,142 @@
 import { useEffect, useMemo, useState } from "react";
-import { getClients } from "../services/clientsService";
-import { getElevatorsSeed, getModels } from "../services/elevatorsService";
 import Section from "../components/ui/Section";
 import Field from "../components/forms/Field";
-import Select from "../components/forms/Select";
 import Input from "../components/ui/Input";
 import EditModal from "../components/ui/EditModal";
 import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
-import { money, dateBR } from "../utils/formatters";
 import { validateRequired } from "../utils/validators";
+import {
+  getElevators,
+  createElevator,
+  updateElevator,
+  removeElevator,
+  onElevatorsChange,
+} from "../services/elevatorsService";
+import { money } from "../utils/formatters";
 
 export default function Elevators() {
-  const [clients, setClients] = useState([]);
-  const [models, setModels] = useState([]);
-  const [seedList, setSeedList] = useState([]);
-  const [localList, setLocalList] = useState(() =>
-    JSON.parse(localStorage.getItem("elevators") || "[]")
-  );
-  const [deletedIds, setDeletedIds] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("elevators_deleted") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [list, setList] = useState([]);
+  const [filtro, setFiltro] = useState("");
 
+  // campos do form
   const [form, setForm] = useState({
-    clienteId: "",
-    modeloId: "",
+    modelo: "",
     capacidadeKg: "",
     velocidadeMps: "",
-    paradas: "",
-    status: "Em Negociação",
     preco: "",
-    instalacaoPrevista: "",
-    serie: "",
   });
   const [errors, setErrors] = useState({});
-  const [filtro, setFiltro] = useState("");
+
+  // modais
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
-    Promise.all([getClients(), getModels(), getElevatorsSeed()])
-      .then(([c, m, e]) => {
-        setClients(c || []);
-        setModels(m || []);
-        setSeedList(Array.isArray(e) ? e : []);
-      })
-      .catch(() => {});
+    const load = () => getElevators().then(setList);
+    load();
+    const unsub = onElevatorsChange(load);
+    return unsub;
   }, []);
 
-  const lista = useMemo(() => {
-    const byId = new Map();
-    for (const it of seedList) byId.set(String(it.id), it);
-    for (const it of localList) byId.set(String(it.id), it);
-
-    const del = new Set((deletedIds || []).map(String));
-    const all = Array.from(byId.values()).filter((x) => !del.has(String(x.id)));
-
-    const t = filtro.trim().toLowerCase();
-    if (!t) return all;
-    return all.filter(
-      (x) =>
-        String(x.id || "")
-          .toLowerCase()
-          .includes(t) ||
-        String(x.modelo || "")
-          .toLowerCase()
-          .includes(t) ||
-        String(x.serie || "")
-          .toLowerCase()
-          .includes(t)
+  const filtered = useMemo(() => {
+    const t = (filtro || "").trim().toLowerCase();
+    if (!t) return list;
+    return list.filter((x) =>
+      [
+        String(x.id || "").toLowerCase(),
+        String(x.modelo || "").toLowerCase(),
+        String(x.capacidadeKg || ""),
+        String(x.velocidadeMps || ""),
+      ].some((s) => s.includes(t))
     );
-  }, [seedList, localList, deletedIds, filtro]);
+  }, [list, filtro]);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const setEditField = (k, v) => setEditForm((f) => ({ ...f, [k]: v }));
 
-  const clientName = (id) => clients.find((c) => c.id === id)?.nome ?? id;
-  const modeloNome = (id) => models.find((m) => m.id === id)?.nome ?? id;
-
-  // === CADASTRAR ===
-  function handleSubmit(e) {
+  // CREATE
+  async function handleSubmit(e) {
     e.preventDefault();
     const req = validateRequired(
-      [
-        "clienteId",
-        "modeloId",
-        "capacidadeKg",
-        "velocidadeMps",
-        "paradas",
-        "preco",
-        "instalacaoPrevista",
-        "serie",
-      ],
+      ["modelo", "capacidadeKg", "velocidadeMps", "preco"],
       form
     );
     setErrors(req);
     if (Object.keys(req).length) return;
 
-    const novo = {
-      id: `ELV-${String(Date.now()).slice(-6)}`,
-      modelo: modeloNome(form.modeloId),
+    await createElevator({
       ...form,
-    };
-    const next = [...localList, novo];
-    setLocalList(next);
-    localStorage.setItem("elevators", JSON.stringify(next));
-    setForm({
-      clienteId: "",
-      modeloId: "",
-      capacidadeKg: "",
-      velocidadeMps: "",
-      paradas: "",
-      status: "Em Negociação",
-      preco: "",
-      instalacaoPrevista: "",
-      serie: "",
+      capacidadeKg: Number(form.capacidadeKg),
+      velocidadeMps: Number(form.velocidadeMps),
+      preco: Number(form.preco),
     });
+
+    setForm({ modelo: "", capacidadeKg: "", velocidadeMps: "", preco: "" });
+    setErrors({});
   }
 
-  // === EDITAR ===
+  // EDIT
   function openEdit(item) {
-    setEditForm(item);
+    setEditForm({ ...item });
     setEditOpen(true);
   }
-  function saveEdit(e) {
+
+  async function saveEdit(e) {
     e.preventDefault();
-    const updated = {
+    const req = validateRequired(
+      ["modelo", "capacidadeKg", "velocidadeMps", "preco"],
+      editForm
+    );
+    if (Object.keys(req).length) {
+      alert("Preencha os campos obrigatórios.");
+      return;
+    }
+    await updateElevator({
       ...editForm,
-      modelo: modeloNome(editForm.modeloId),
-    };
-    const next = localList.some((x) => x.id === updated.id)
-      ? localList.map((x) => (x.id === updated.id ? updated : x))
-      : [...localList, updated];
-    setLocalList(next);
-    localStorage.setItem("elevators", JSON.stringify(next));
+      capacidadeKg: Number(editForm.capacidadeKg),
+      velocidadeMps: Number(editForm.velocidadeMps),
+      preco: Number(editForm.preco),
+    });
     setEditOpen(false);
   }
 
-  // === EXCLUIR ===
+  // DELETE
   function requestDelete(item) {
-    setToDelete(item ? { id: String(item.id) } : null);
+    setToDelete(item);
     setConfirmOpen(true);
   }
-
-  function confirmDelete() {
-    const id = String(toDelete?.id || "");
-    if (!id) return;
-
-    if (localList.some((x) => String(x.id) === id)) {
-      const next = localList.filter((x) => String(x.id) !== id);
-      setLocalList(next);
-      localStorage.setItem("elevators", JSON.stringify(next));
-    }
-
-    const nextDel = Array.from(
-      new Set([...(deletedIds || []).map(String), id])
-    );
-    setDeletedIds(nextDel);
-    localStorage.setItem("elevators_deleted", JSON.stringify(nextDel));
-
+  async function confirmDelete() {
+    if (toDelete?.id) await removeElevator(toDelete.id);
     setConfirmOpen(false);
     setToDelete(null);
   }
 
   return (
     <>
-      <Section title="Cadastro de Elevadores">
+      <Section
+        title="Cadastro de Produtos"
+        subtitle="Registre um novo produto."
+      >
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
-            <Field label="Cliente" error={errors.clienteId}>
-              <Select
-                value={form.clienteId}
-                onChange={(e) => setField("clienteId", e.target.value)}
-                options={clients}
-                placeholder="Selecione o cliente"
+            <Field label="Modelo" error={errors.modelo}>
+              <Input
+                value={form.modelo}
+                onChange={(e) => setField("modelo", e.target.value)}
               />
             </Field>
-            <Field label="Modelo" error={errors.modeloId}>
-              <Select
-                value={form.modeloId}
-                onChange={(e) => setField("modeloId", e.target.value)}
-                options={models}
-                placeholder="Selecione o modelo"
-              />
-            </Field>
-            <Field label="Capacidade (kg)">
+
+            <Field label="Capacidade (kg)" error={errors.capacidadeKg}>
               <Input
                 type="number"
                 value={form.capacidadeKg}
                 onChange={(e) => setField("capacidadeKg", e.target.value)}
               />
             </Field>
-            <Field label="Velocidade (m/s)">
+
+            <Field label="Velocidade (m/s)" error={errors.velocidadeMps}>
               <Input
                 type="number"
                 step="0.1"
@@ -204,14 +144,8 @@ export default function Elevators() {
                 onChange={(e) => setField("velocidadeMps", e.target.value)}
               />
             </Field>
-            <Field label="Paradas">
-              <Input
-                type="number"
-                value={form.paradas}
-                onChange={(e) => setField("paradas", e.target.value)}
-              />
-            </Field>
-            <Field label="Preço (R$)">
+
+            <Field label="Preço (R$)" error={errors.preco}>
               <Input
                 type="number"
                 value={form.preco}
@@ -219,7 +153,22 @@ export default function Elevators() {
               />
             </Field>
           </div>
+
           <div className="actions">
+            <button
+              className="btn ghost"
+              type="reset"
+              onClick={() =>
+                setForm({
+                  modelo: "",
+                  capacidadeKg: "",
+                  velocidadeMps: "",
+                  preco: "",
+                })
+              }
+            >
+              Limpar
+            </button>
             <button className="btn primary" type="submit">
               Salvar
             </button>
@@ -227,76 +176,104 @@ export default function Elevators() {
         </form>
       </Section>
 
-      <Section title="Elevadores Cadastrados">
-        <input
-          className="input"
-          placeholder="Filtrar..."
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
-        <table className="table">
-          <thead>
-            <tr>
-              <th style={{ width: 70 }}>Ações</th>
-              <th>ID</th>
-              <th>Cliente</th>
-              <th>Modelo</th>
-              <th>Preço</th>
-              <th>Série</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lista.map((e) => (
-              <tr key={e.id}>
-                <td>
-                  <div className="row-actions">
-                    <button className="icon-btn" onClick={() => openEdit(e)}>
-                      ✏️
-                    </button>
-                    <button
-                      className="icon-btn danger"
-                      onClick={() => requestDelete(e)}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-                <td>{e.id}</td>
-                <td>{clientName(e.clienteId)}</td>
-                <td>{e.modelo}</td>
-                <td>{money(e.preco)}</td>
-                <td>{e.serie}</td>
+      <Section title="Produtos Cadastrados">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            marginBottom: 12,
+          }}
+        >
+          <input
+            className="input"
+            style={{ maxWidth: 320 }}
+            placeholder="Filtrar por modelo ou código…"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+          />
+          <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
+            {filtered.length} registro(s)
+          </div>
+        </div>
+
+        <div className="table-scroll">
+          <table className="table">
+            <thead>
+              <tr>
+                <th style={{ width: 70 }}>Ações</th>
+                {/* <th>ID</th>  // removido do visual */}
+                <th>Modelo</th>
+                <th>Capacidade</th>
+                <th>Velocidade</th>
+                <th>Preço</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((e) => (
+                <tr key={e.id}>
+                  <td>
+                    <div className="row-actions">
+                      <button
+                        className="icon-btn"
+                        title="Editar"
+                        onClick={() => openEdit(e)}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="icon-btn danger"
+                        title="Excluir"
+                        onClick={() => requestDelete(e)}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                  {/* <td>{e.id}</td>  // removido */}
+                  <td>{e.modelo}</td>
+                  <td>{e.capacidadeKg} kg</td>
+                  <td>{e.velocidadeMps} m/s</td>
+                  <td>{money(e.preco)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Section>
 
-      {/* === MODAIS === */}
+      {/* MODAIS */}
       <EditModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        title={`Editar Elevador — ${editForm.id}`}
+        title={`Editar Produto — ${editForm.modelo || ""}`} // título com o modelo
         onSubmit={saveEdit}
       >
-        <Field label="Cliente">
-          <Select
-            value={editForm.clienteId}
-            onChange={(e) => setEditField("clienteId", e.target.value)}
-            options={clients}
+        <Field label="Modelo">
+          <Input
+            value={editForm.modelo ?? ""}
+            onChange={(e) => setEditField("modelo", e.target.value)}
           />
         </Field>
-        <Field label="Modelo">
-          <Select
-            value={editForm.modeloId}
-            onChange={(e) => setEditField("modeloId", e.target.value)}
-            options={models}
+        <Field label="Capacidade (kg)">
+          <Input
+            type="number"
+            value={editForm.capacidadeKg ?? ""}
+            onChange={(e) => setEditField("capacidadeKg", e.target.value)}
+          />
+        </Field>
+        <Field label="Velocidade (m/s)">
+          <Input
+            type="number"
+            step="0.1"
+            value={editForm.velocidadeMps ?? ""}
+            onChange={(e) => setEditField("velocidadeMps", e.target.value)}
           />
         </Field>
         <Field label="Preço (R$)">
           <Input
             type="number"
-            value={editForm.preco}
+            value={editForm.preco ?? ""}
             onChange={(e) => setEditField("preco", e.target.value)}
           />
         </Field>
@@ -306,7 +283,7 @@ export default function Elevators() {
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={confirmDelete}
-        itemName={toDelete?.id}
+        itemName={toDelete?.modelo || ""} // confirmação com o modelo
       />
     </>
   );

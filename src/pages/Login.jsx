@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -13,7 +13,7 @@ export default function Login() {
   const [erro, setErro] = useState("");
 
   useEffect(() => {
-    fetch("/data/Users.json")
+    fetch("/data/users.json")
       .then((r) => r.json())
       .then(setUsers)
       .catch(() => setUsers([]));
@@ -105,6 +105,28 @@ export default function Login() {
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
+      </div>
+
+      {/* link fixo para o portal do cliente */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 20,
+          right: 20,
+          fontSize: 14,
+          color: "var(--color-blue, #2267f2)",
+        }}
+      >
+        <Link
+          to="/portal-cliente"
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+            fontWeight: 500,
+          }}
+        >
+          Acessar portal do cliente
+        </Link>
       </div>
     </div>
   );

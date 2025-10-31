@@ -1,46 +1,116 @@
 import { useEffect, useState } from "react";
 import { money } from "../utils/formatters";
-import {
-  getSalesSummary,
-  getSalesByMonth,
-  getSalesStatus,
-  getSalesOpen,
-} from "../services/salesService";
+
 import Card from "../components/ui/Card";
 import BarChart from "../components/charts/BarChart";
 import DonutChart from "../components/charts/DonutChart";
 import OpenSalesTable from "../components/tables/OpenSalesTable";
 
+import {
+  getSalesSummary,
+  getSalesByStatus,
+  getOpenSales,
+  onOperationsChange,
+} from "../services/operationsService";
+import { getClients } from "../services/clientsService";
+import { getElevators } from "../services/elevatorsService";
+
+// formata YYYY-MM-DD em pt-BR de forma segura
+const dateBRsafe = (s) => {
+  if (!s) return "";
+  const d = new Date(s);
+  const ok = !Number.isNaN(d.getTime());
+  return ok ? d.toLocaleDateString("pt-BR") : "";
+};
+
+// série estática: últimos 6 meses anteriores ao mês atual
+function last6MonthsStatic() {
+  const now = new Date();
+  const arr = [];
+  for (let i = 6; i >= 1; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const mes = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}`;
+    const valor = 4 + (d.getMonth() % 6) * 2; // qualquer padrão que queira
+    arr.push({ mes, valor });
+  }
+  return arr;
+}
+
 export default function Dashboard() {
   const [summary, setSummary] = useState(null);
-  const [months, setMonths] = useState([]);
-  const [status, setStatus] = useState(null);
-  const [openSales, setOpenSales] = useState([]);
+  const [months, setMonths] = useState([]); // [{label, value}]
+  const [status, setStatus] = useState(null); // {negociacao, preparacao, integracao, concluido}
+  const [openSales, setOpenSales] = useState([]); // dados já formatados p/ tabela
+  const [clients, setClients] = useState([]);
+  const [elevators, setElevators] = useState([]);
 
   useEffect(() => {
-    Promise.all([
-      getSalesSummary(),
-      getSalesByMonth(),
-      getSalesStatus(),
-      getSalesOpen(),
-    ])
-      .then(([sum, mon, st, open]) => {
-        setSummary(sum);
-        setMonths(mon.serie || []);
-        setStatus(st);
-        setOpenSales(open.items || []);
-      })
-      .catch((e) => {
-        console.error("Erro ao carregar dados do dashboard:", e);
-        alert("Erro ao carregar dados do dashboard.");
+    const load = async () => {
+      const [sum, byStatus, open, cli, evs] = await Promise.all([
+        getSalesSummary(),
+        getSalesByStatus(),
+        getOpenSales(),
+        getClients(),
+        getElevators(),
+      ]);
+
+      // --------- CARDS dinâmicos
+      setSummary({
+        totalVendas: { valor: Number(sum.total || 0), delta: sum.deltas.total },
+        faturamento: {
+          valor: Number(sum.faturamento || 0),
+          delta: sum.deltas.faturamento,
+        },
+        vendasPendentes: {
+          valor: Number(sum.pendentes || 0),
+          delta: sum.deltas.pendentes,
+        },
+        modeloMais: { nome: sum.modeloMais, delta: sum.deltas.modelo },
       });
+
+      // gráfico por mês (estático)
+      setMonths(last6MonthsStatic());
+
+      // --------- DONUT por status
+      setStatus({
+        negociacao: Number(byStatus["Em Negociação"] || 0),
+        preparacao: Number(byStatus["Aguardando Peças"] || 0),
+        integracao: Number(byStatus["Em Andamento"] || 0),
+        concluido: Number(byStatus["Concluída"] || 0),
+      });
+
+      // --------- TABELA ABERTAS (prazo = dataLimite) + produto pelo NOME
+      const nameOfClient = (id) =>
+        (cli || []).find((c) => c.id === id)?.nome || id;
+      const nameOfProduct = (id) =>
+        (evs || []).find((e) => e.id === id)?.modelo || id;
+
+      const openMapped = (open || []).map((o) => ({
+        cliente: nameOfClient(o.clienteId),
+        elevador: nameOfProduct(o.elevadorId), // envia NOME (vamos renomear a coluna no componente)
+        status: o.status || "—",
+        valor: Number(o.valor || 0),
+        prazo: dateBRsafe(o.dataLimite) || "", // só prazo (entrega)
+      }));
+      setOpenSales(openMapped);
+
+      setClients(cli || []);
+      setElevators(evs || []);
+    };
+
+    load();
+    const unsub = onOperationsChange(load);
+    return unsub;
   }, []);
 
   if (!summary || !status) return <>Carregando…</>;
 
   return (
     <>
-      {/* cards de resumo */}
+      {/* cards */}
       <div
         className="cards"
         style={{
@@ -50,7 +120,7 @@ export default function Dashboard() {
           marginBottom: 16,
         }}
       >
-        <Card title="Total de Vendas">
+        <Card title="Total de Operações">
           <div className="card-value">{summary.totalVendas.valor}</div>
           <div className="delta">
             ↗ +{summary.totalVendas.delta}% do mês passado
@@ -66,19 +136,19 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        <Card title="Vendas Pendentes">
+        <Card title="Operações Pendentes">
           <div className="card-value">{summary.vendasPendentes.valor}</div>
           <div className="delta">
             ↘ {summary.vendasPendentes.delta}% do mês passado
           </div>
         </Card>
 
-        <Card title="Elevador mais vendido">
+        <Card title="Modelo mais recorrente">
           <div className="card-value" style={{ color: "var(--color-orange)" }}>
-            Atlas Premium
+            {summary.modeloMais.nome || "—"}
           </div>
           <div className="delta">
-            ↗ +{summary.valorPendente.delta}% do mês passado
+            ↗ +{summary.modeloMais.delta}% do mês passado
           </div>
         </Card>
       </div>
@@ -94,15 +164,15 @@ export default function Dashboard() {
         }}
       >
         <div className="panel">
-          <h3 style={{ margin: "0 0 6px" }}>Vendas por Mês</h3>
+          <h3 style={{ margin: "0 0 6px" }}>Operações por Mês</h3>
           <p className="subtitle" style={{ marginTop: 0 }}>
-            Número de vendas realizadas nos últimos 6 meses
+            Quantidade de operações realizadas nos últimos meses
           </p>
-          <BarChart data={months} />
+          <BarChart data={months} /> {/* months: [{label, value}] */}
         </div>
 
         <div className="panel">
-          <h3 style={{ margin: "0 0 6px" }}>Status das Vendas</h3>
+          <h3 style={{ margin: "0 0 6px" }}>Status das Operações</h3>
           <p className="subtitle" style={{ marginTop: 0 }}>
             Distribuição por status atual
           </p>
@@ -131,9 +201,9 @@ export default function Dashboard() {
 
       {/* tabela */}
       <div className="panel">
-        <h3 style={{ margin: "0 0 6px" }}>Vendas Não Concluídas</h3>
+        <h3 style={{ margin: "0 0 6px" }}>Operações Não Concluídas</h3>
         <p className="subtitle" style={{ marginTop: 0 }}>
-          Vendas que precisam de acompanhamento
+          Operações que precisam de acompanhamento
         </p>
         <OpenSalesTable items={openSales} />
       </div>

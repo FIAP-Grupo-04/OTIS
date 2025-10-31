@@ -1,108 +1,126 @@
 import { useEffect, useMemo, useState } from "react";
-import { getCustomerOrders } from "../services/portalService";
 import { getClients } from "../services/clientsService";
+import { getOperations } from "../services/operationsService";
+import { getElevators } from "../services/elevatorsService";
 import "../styles/portal.css";
 
-export default function PortalCliente() {
-  const [orders, setOrders] = useState([]);
+export default function CustomerPortal() {
+  const [cnpj, setCnpj] = useState("");
   const [clients, setClients] = useState([]);
-  const [codigo, setCodigo] = useState("");
-  const [docInput, setDocInput] = useState(""); // CPF/CNPJ digitado
+  const [ops, setOps] = useState([]);
+  const [elevators, setElevators] = useState([]);
   const [buscou, setBuscou] = useState(false);
+  const [clienteId, setClienteId] = useState(null);
 
   useEffect(() => {
-    Promise.all([getCustomerOrders(), getClients()])
-      .then(([o, c]) => {
-        setOrders(Array.isArray(o) ? o : []);
+    // carrega "db"
+    Promise.all([getClients(), getOperations(), getElevators()])
+      .then(([c, o, e]) => {
         setClients(Array.isArray(c) ? c : []);
+        setOps(Array.isArray(o) ? o : []);
+        setElevators(Array.isArray(e) ? e : []);
       })
       .catch(() => {
-        setOrders([]);
         setClients([]);
+        setOps([]);
+        setElevators([]);
       });
   }, []);
 
-  const normalizeDoc = (s = "") => String(s).replace(/\D/g, "");
-  const nomeCliente = (id) => clients.find((c) => c.id === id)?.nome ?? id;
+  const onlyDigits = (s = "") => String(s).replace(/\D/g, "");
+  const safeDate = (s) => {
+    if (!s) return null;
+    const d = new Date(s);
+    return Number.isNaN(d.getTime()) ? null : d;
+  };
+  const dateBR = (s) => {
+    const d = safeDate(s);
+    return d ? d.toLocaleDateString("pt-BR") : "-";
+  };
   const money = (v) =>
     Number(v || 0).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
       maximumFractionDigits: 0,
     });
-  const dateBR = (s) => (s ? new Date(s).toLocaleDateString("pt-BR") : "-");
   const badge = (s = "") =>
     /Conclu/i.test(s)
       ? "b-green"
-      : /Instala/i.test(s)
+      : /Andamento|Instala|Produ/i.test(s)
       ? "b-blue"
-      : /Produ|Aguard/i.test(s)
+      : /Aguard|Peças|Proposta/i.test(s)
       ? "b-yellow"
       : "b-orange";
 
-  const resultados = useMemo(() => {
-    if (!buscou) return [];
-    const cod = codigo.trim().toLowerCase();
-    const doc = normalizeDoc(docInput);
+  const productName = (id) => elevators.find((e) => e.id === id)?.modelo || "-";
 
-    return orders.filter((o) => {
-      const idOk = String(o.id || "").toLowerCase() === cod;
-      const docJson = normalizeDoc(o.cpf ?? o.documento ?? "");
-      return idOk && docJson === doc;
+  const resultados = useMemo(() => {
+    if (!buscou || !clienteId) return [];
+    // filtra operações do cliente
+    const meus = ops.filter((o) => o.clienteId === clienteId);
+
+    // ordena: mais recente em cima.
+    // prioridade de ordenação: dataLimite (prazo) desc; fallback: dataAbertura desc
+    const sorted = [...meus].sort((a, b) => {
+      const da =
+        safeDate(a.dataLimite) || safeDate(a.dataAbertura) || new Date(0);
+      const db =
+        safeDate(b.dataLimite) || safeDate(b.dataAbertura) || new Date(0);
+      return db - da;
     });
-  }, [buscou, codigo, docInput, orders]);
+
+    return sorted;
+  }, [buscou, clienteId, ops]);
 
   function handleBuscar(e) {
     e.preventDefault();
-    if (!codigo.trim() || !docInput.trim()) {
-      alert("Preencha Código do Produto e CPF/CNPJ.");
+    const doc = onlyDigits(cnpj);
+    if (!doc) {
+      alert("Informe um CPF/CNPJ válido.");
       return;
     }
+    const found = clients.find((c) => onlyDigits(c.cpfCnpj) === doc);
+    if (!found) {
+      setClienteId(null);
+      setBuscou(true);
+      return;
+    }
+    setClienteId(found.id);
     setBuscou(true);
   }
 
   return (
     <div className="portal-bg">
-      {/* Card principal de busca */}
-      <div className="portal-card">
-        <div className="portal-card-brand">
-          <h3>Otis</h3>
-          <p>In control</p>
-        </div>
+      {/* Branding opcional */}
+      <div className="portal-brand">
+        <h1>Otis</h1>
+        <p>In control</p>
+      </div>
 
-        <h4 className="portal-card-title">Portal do Cliente</h4>
+      <h2 className="portal-title">Portal do Cliente</h2>
+
+      {/* Card principal — busca por CNPJ */}
+      <div className="portal-card">
+        <h4 className="portal-card-title">Consultar pedidos</h4>
         <p className="portal-card-subtitle">
-          Digite o código do seu produto e CPF/CNPJ para acompanhar o status do
-          seu elevador Otis.
+          Digite seu CNPJ para ver suas operações mais recentes.
         </p>
 
         <form onSubmit={handleBuscar} className="portal-form" noValidate>
-          <div className="field">
-            <label className="label">Código do Produto</label>
+          <div className="field" style={{ gridColumn: "1 / -1" }}>
+            <label className="label">CNPJ</label>
             <input
               className="input"
-              placeholder="Ex: ELV001"
-              value={codigo}
-              onChange={(e) => setCodigo(e.target.value)}
-              inputMode="latin"
-              autoComplete="off"
-            />
-          </div>
-
-          <div className="field">
-            <label className="label">CPF / CNPJ</label>
-            <input
-              className="input"
-              placeholder="000.000.000-00 ou 00.000.000/0000-00"
-              value={docInput}
-              onChange={(e) => setDocInput(e.target.value)}
+              placeholder="00.000.000/0001-00"
+              value={cnpj}
+              onChange={(e) => setCnpj(e.target.value)}
               inputMode="numeric"
               autoComplete="off"
             />
           </div>
 
           <button className="btn-primary" type="submit">
-            Consultar Status
+            Consultar
           </button>
         </form>
       </div>
@@ -110,82 +128,114 @@ export default function PortalCliente() {
       {/* Resultado */}
       {buscou && (
         <div style={{ width: "100%", maxWidth: 840 }}>
-          {resultados.length === 0 ? (
+          {!clienteId ? (
             <div className="portal-card">
-              <b>Nenhum pedido encontrado</b> para os dados informados.
+              <b>Nenhum cliente encontrado</b> para o documento informado.
+            </div>
+          ) : resultados.length === 0 ? (
+            <div className="portal-card">
+              <b>Nenhum pedido encontrado</b> para este cliente.
             </div>
           ) : (
-            resultados.map((o) => (
-              <div key={o.id} className="portal-card">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: 12,
-                  }}
-                >
-                  <div>
-                    <h3 style={{ margin: "0 0 4px" }}>
-                      {o.id} — {o.produto}
-                    </h3>
-                    <p className="portal-card-subtitle" style={{ margin: 0 }}>
-                      Cliente: <b>{nomeCliente(o.clienteId)}</b> • Valor:{" "}
-                      <b>{money(o.valor)}</b>
-                    </p>
-                  </div>
-                  <span className={`badge ${badge(o.situacaoAtual)}`}>
-                    {o.situacaoAtual}
-                  </span>
-                </div>
+            <div className="portal-card">
+              <h4 className="portal-card-title" style={{ marginBottom: 8 }}>
+                Pedidos do Cliente
+              </h4>
+              <p className="portal-card-subtitle" style={{ marginTop: 0 }}>
+                Do mais recente para o mais antigo
+              </p>
 
-                <div className="divider" />
-
-                <ul
-                  style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: 0,
-                    display: "grid",
-                    gap: 10,
-                  }}
-                >
-                  {o.historico?.map((h, i) => (
-                    <li
-                      key={i}
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: "12px 0 0",
+                  display: "grid",
+                  gap: 10,
+                }}
+              >
+                {resultados.map((o) => (
+                  <li
+                    key={o.id}
+                    style={{
+                      border: "1px solid var(--line, #e5e7eb)",
+                      borderRadius: 10,
+                      padding: 12,
+                      display: "grid",
+                      gap: 8,
+                    }}
+                  >
+                    {/* topo: produto + status */}
+                    <div
                       style={{
-                        display: "grid",
-                        gridTemplateColumns: "120px 1fr",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                         gap: 12,
-                        alignItems: "start",
                       }}
                     >
-                      <div
-                        style={{ fontSize: 12, color: "var(--color-muted)" }}
-                      >
-                        {dateBR(h.data)}
+                      <div>
+                        <div style={{ fontWeight: 700, marginBottom: 2 }}>
+                          {productName(o.elevadorId)}
+                        </div>
+                        <div
+                          style={{ fontSize: 12, color: "var(--color-muted)" }}
+                        >
+                          Tipo: <b>{o.tipoOperacao}</b> • Técnico:{" "}
+                          <b>{o.responsavelTecnico || "-"}</b>
+                        </div>
+                      </div>
+                      <span className={`badge ${badge(o.status)}`}>
+                        {o.status}
+                      </span>
+                    </div>
+
+                    {/* barra de infos */}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(3, 1fr)",
+                        gap: 8,
+                        fontSize: 13,
+                      }}
+                    >
+                      <div>
+                        <div style={{ color: "var(--color-muted)" }}>
+                          Abertura
+                        </div>
+                        <div style={{ fontWeight: 600 }}>
+                          {dateBR(o.dataAbertura)}
+                        </div>
                       </div>
                       <div>
-                        <div style={{ fontWeight: 700 }}>{h.status}</div>
-                        {h.descricao && (
-                          <div style={{ fontSize: 14 }}>{h.descricao}</div>
-                        )}
+                        <div style={{ color: "var(--color-muted)" }}>Prazo</div>
+                        <div style={{ fontWeight: 600 }}>
+                          {dateBR(o.dataLimite)}
+                        </div>
                       </div>
-                    </li>
-                  ))}
-                </ul>
+                      <div>
+                        <div style={{ color: "var(--color-muted)" }}>Valor</div>
+                        <div style={{ fontWeight: 600 }}>{money(o.valor)}</div>
+                      </div>
+                    </div>
 
-                <div
-                  style={{
-                    marginTop: 10,
-                    fontSize: 12,
-                    color: "var(--color-muted)",
-                  }}
-                >
-                  Última atualização em {dateBR(o.atualizadoEm)}
-                </div>
-              </div>
-            ))
+                    {/* descrição, se houver */}
+                    {o.descricao && (
+                      <div
+                        style={{
+                          marginTop: 6,
+                          fontSize: 13,
+                          lineHeight: 1.4,
+                          color: "var(--color-text)",
+                        }}
+                      >
+                        {o.descricao}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}

@@ -1,29 +1,952 @@
 [
   {
-    "id": "alpha",
-    "nome": "Construtora Alpha",
-    "cnpj": "12.345.678/0001-99",
-    "responsavel": "Ana Souza",
-    "telefone": "(11) 99999-0001",
-    "email": "ana@alpha.com",
-    "endereco": "Rua das Flores, 100 - São Paulo/SP"
+    "id": "CLI001",
+    "nome": "Hospital Alpha",
+    "cpfCnpj": "43.321.819/6001-33",
+    "email": "contato@alpha.com.br",
+    "telefone": "+504 816-127-4257",
+    "responsavel": "Aline Moreira",
+    "endereco": "Avenida Alpha, 869 - Manaus/AM, Brasil",
+    "pais": "Brasil"
   },
   {
-    "id": "beta",
-    "nome": "Edifício Beta",
-    "cnpj": "23.456.789/0001-88",
-    "responsavel": "Carlos Lima",
-    "telefone": "(11) 99999-0002",
-    "email": "carlos@beta.com",
-    "endereco": "Av. Paulista, 1500 - São Paulo/SP"
+    "id": "CLI002",
+    "nome": "Empreendimentos Mirage",
+    "cpfCnpj": "40.265.423/5116-15",
+    "email": "contato@mirage.com.br",
+    "telefone": "+598 818-370-1711",
+    "responsavel": "Sérgio Matos",
+    "endereco": "Avenida Mirage, 1108 - Fortaleza/CE, Brasil",
+    "pais": "Brasil"
   },
   {
-    "id": "gamma",
-    "nome": "Shopping Center Gamma",
-    "cnpj": "34.567.890/0001-77",
-    "responsavel": "Fernanda Silva",
-    "telefone": "(11) 99999-0003",
-    "email": "fernanda@gamma.com",
-    "endereco": "Av. Central, 500 - Campinas/SP"
+    "id": "CLI003",
+    "nome": "Hospital Solar",
+    "cpfCnpj": "84.959.310/3413-16",
+    "email": "contato@solar.com.br",
+    "telefone": "+502 664-750-6977",
+    "responsavel": "Luciana Prado",
+    "endereco": "Avenida Solar, 768 - Rio de Janeiro/RJ, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI004",
+    "nome": "Parque Horizon",
+    "cpfCnpj": "41.928.327/6483-50",
+    "email": "contato@horizon.com.br",
+    "telefone": "+593 232-924-6168",
+    "responsavel": "Lívia Melo",
+    "endereco": "Avenida Horizon, 558 - Florianópolis/SC, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI005",
+    "nome": "Edifício Horizon",
+    "cpfCnpj": "53.767.242/3884-96",
+    "email": "contato@horizon.com.br",
+    "telefone": "+1 608-470-4593",
+    "responsavel": "João Carvalho",
+    "endereco": "Avenida Horizon, 1053 - Fortaleza/CE, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI006",
+    "nome": "Colégio Gamma",
+    "cpfCnpj": "12.269.166/9784-80",
+    "email": "contato@gamma.com.br",
+    "telefone": "+597 938-217-9797",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Gamma, 1322 - São Paulo/SP, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI007",
+    "nome": "Universidade Delta",
+    "cpfCnpj": "62.704.828/1489-32",
+    "email": "contato@delta.com.br",
+    "telefone": "+598 980-265-9837",
+    "responsavel": "Rafael Cunha",
+    "endereco": "Avenida Delta, 11 - Porto Alegre/RS, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI008",
+    "nome": "Tech Park Prime",
+    "cpfCnpj": "01.543.039/1171-82",
+    "email": "contato@prime.com.br",
+    "telefone": "+56 875-586-3705",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Prime, 1090 - Brasília/DF, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI009",
+    "nome": "Tech Park Estação",
+    "cpfCnpj": "83.465.787/1331-50",
+    "email": "contato@estação.com.br",
+    "telefone": "+1 767-335-4608",
+    "responsavel": "Marcos Silva",
+    "endereco": "Avenida Estação, 155 - Curitiba/PR, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI010",
+    "nome": "Residencial Central",
+    "cpfCnpj": "05.183.473/8299-73",
+    "email": "contato@central.com.br",
+    "telefone": "+507 616-294-2545",
+    "responsavel": "Patrícia Dias",
+    "endereco": "Avenida Central, 1359 - Rio de Janeiro/RJ, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI011",
+    "nome": "Torre Nova Era",
+    "cpfCnpj": "67.010.651/3338-72",
+    "email": "contato@novaera.com.br",
+    "telefone": "+591 387-385-8579",
+    "responsavel": "Fernanda Tavares",
+    "endereco": "Avenida Nova Era, 164 - Salvador/BA, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI012",
+    "nome": "Complexo Oceano",
+    "cpfCnpj": "08.013.267/7360-26",
+    "email": "contato@oceano.com.br",
+    "telefone": "+55 599-371-8454",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Oceano, 876 - Rio de Janeiro/RJ, Brasil",
+    "pais": "Brasil"
+  },
+  {
+    "id": "CLI013",
+    "nome": "Comercial Skyline",
+    "cpfCnpj": "34.309.805/0097-88",
+    "email": "contato@skyline.com",
+    "telefone": "+51 258-620-2312",
+    "responsavel": "Luciana Prado",
+    "endereco": "Avenida Skyline, 150 - Monterrey, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI014",
+    "nome": "Tech Park Gamma",
+    "cpfCnpj": "61.939.909/1699-85",
+    "email": "contato@gamma.com",
+    "telefone": "+502 409-785-6147",
+    "responsavel": "Fernanda Tavares",
+    "endereco": "Avenida Gamma, 553 - Puebla, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI015",
+    "nome": "Centro Médico Omega",
+    "cpfCnpj": "75.107.991/1838-42",
+    "email": "contato@omega.com",
+    "telefone": "+598 270-350-7054",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Omega, 333 - Querétaro, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI016",
+    "nome": "Complexo Oceano",
+    "cpfCnpj": "98.084.124/1182-44",
+    "email": "contato@oceano.com",
+    "telefone": "+501 415-834-6617",
+    "responsavel": "Gustavo Lima",
+    "endereco": "Avenida Oceano, 1417 - Querétaro, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI017",
+    "nome": "Faculdade Liberdade",
+    "cpfCnpj": "40.164.005/2427-86",
+    "email": "contato@liberdade.com",
+    "telefone": "+505 209-214-2232",
+    "responsavel": "João Carvalho",
+    "endereco": "Avenida Liberdade, 1127 - Toluca, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI018",
+    "nome": "Residencial Nova Era",
+    "cpfCnpj": "82.620.450/5331-58",
+    "email": "contato@novaera.com",
+    "telefone": "+591 835-867-3532",
+    "responsavel": "Fernanda Tavares",
+    "endereco": "Avenida Nova Era, 342 - Cancún, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI019",
+    "nome": "Shopping Estação",
+    "cpfCnpj": "25.634.216/0733-75",
+    "email": "contato@estação.com",
+    "telefone": "+1 433-328-1387",
+    "responsavel": "Gustavo Lima",
+    "endereco": "Avenida Estação, 826 - Ciudad de México, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI020",
+    "nome": "Universidade Premium",
+    "cpfCnpj": "45.868.501/4294-01",
+    "email": "contato@premium.com",
+    "telefone": "+501 644-453-6139",
+    "responsavel": "Hamilton Siqueira",
+    "endereco": "Avenida Premium, 1251 - Guadalajara, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI021",
+    "nome": "Escritório Delta",
+    "cpfCnpj": "93.406.088/3561-59",
+    "email": "contato@delta.com",
+    "telefone": "+53 879-968-3041",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Delta, 1048 - León, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI022",
+    "nome": "Aeroporto Estação",
+    "cpfCnpj": "64.823.662/9946-80",
+    "email": "contato@estação.com",
+    "telefone": "+1 493-315-8043",
+    "responsavel": "Marcelo Freire",
+    "endereco": "Avenida Estação, 1252 - Tijuana, México",
+    "pais": "México"
+  },
+  {
+    "id": "CLI023",
+    "nome": "Universidade Mirage",
+    "cpfCnpj": "73.872.148/9513-43",
+    "email": "contato@mirage.com",
+    "telefone": "+58 350-125-1757",
+    "responsavel": "Fernanda Tavares",
+    "endereco": "Avenida Mirage, 983 - Mendoza, Argentina",
+    "pais": "Argentina"
+  },
+  {
+    "id": "CLI024",
+    "nome": "Tech Park Gamma",
+    "cpfCnpj": "69.367.632/0163-28",
+    "email": "contato@gamma.com",
+    "telefone": "+506 251-670-5082",
+    "responsavel": "Patrícia Dias",
+    "endereco": "Avenida Gamma, 944 - Mendoza, Argentina",
+    "pais": "Argentina"
+  },
+  {
+    "id": "CLI025",
+    "nome": "Hotel Mirage",
+    "cpfCnpj": "88.957.986/8727-74",
+    "email": "contato@mirage.com",
+    "telefone": "+593 852-383-9540",
+    "responsavel": "Carolina Lopes",
+    "endereco": "Avenida Mirage, 1293 - Mar del Plata, Argentina",
+    "pais": "Argentina"
+  },
+  {
+    "id": "CLI026",
+    "nome": "Empreendimentos Premium",
+    "cpfCnpj": "14.345.581/2236-23",
+    "email": "contato@premium.com",
+    "telefone": "+54 624-517-6421",
+    "responsavel": "Aline Moreira",
+    "endereco": "Avenida Premium, 964 - Mendoza, Argentina",
+    "pais": "Argentina"
+  },
+  {
+    "id": "CLI027",
+    "nome": "Torre Beta",
+    "cpfCnpj": "66.909.670/5466-88",
+    "email": "contato@beta.com",
+    "telefone": "+501 425-599-4595",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Beta, 902 - Córdoba, Argentina",
+    "pais": "Argentina"
+  },
+  {
+    "id": "CLI028",
+    "nome": "Colégio Alpha",
+    "cpfCnpj": "56.272.980/6990-16",
+    "email": "contato@alpha.com",
+    "telefone": "+56 672-286-1823",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Alpha, 786 - Mendoza, Argentina",
+    "pais": "Argentina"
+  },
+  {
+    "id": "CLI029",
+    "nome": "Universidade Horizon",
+    "cpfCnpj": "55.646.417/0805-31",
+    "email": "contato@horizon.com",
+    "telefone": "+592 241-872-1508",
+    "responsavel": "Fernanda Tavares",
+    "endereco": "Avenida Horizon, 418 - Barranquilla, Colômbia",
+    "pais": "Colômbia"
+  },
+  {
+    "id": "CLI030",
+    "nome": "Construtora Summit",
+    "cpfCnpj": "32.719.374/5299-12",
+    "email": "contato@summit.com",
+    "telefone": "+1 310-692-1420",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Summit, 1189 - Medellín, Colômbia",
+    "pais": "Colômbia"
+  },
+  {
+    "id": "CLI031",
+    "nome": "Centro Médico Solar",
+    "cpfCnpj": "31.931.491/9058-65",
+    "email": "contato@solar.com",
+    "telefone": "+54 718-763-6590",
+    "responsavel": "Marcos Silva",
+    "endereco": "Avenida Solar, 870 - Bucaramanga, Colômbia",
+    "pais": "Colômbia"
+  },
+  {
+    "id": "CLI032",
+    "nome": "Colégio Delta",
+    "cpfCnpj": "57.262.849/8776-94",
+    "email": "contato@delta.com",
+    "telefone": "+53 451-950-2419",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Delta, 933 - Barranquilla, Colômbia",
+    "pais": "Colômbia"
+  },
+  {
+    "id": "CLI033",
+    "nome": "Empreendimentos Mirage",
+    "cpfCnpj": "96.507.527/3545-49",
+    "email": "contato@mirage.com",
+    "telefone": "+502 769-110-9464",
+    "responsavel": "Gustavo Lima",
+    "endereco": "Avenida Mirage, 185 - Cartagena, Colômbia",
+    "pais": "Colômbia"
+  },
+  {
+    "id": "CLI034",
+    "nome": "Empreendimentos Estação",
+    "cpfCnpj": "83.777.014/3634-95",
+    "email": "contato@estação.com",
+    "telefone": "+507 766-643-6632",
+    "responsavel": "Hamilton Siqueira",
+    "endereco": "Avenida Estação, 1137 - Barranquilla, Colômbia",
+    "pais": "Colômbia"
+  },
+  {
+    "id": "CLI035",
+    "nome": "Universidade Nova Era",
+    "cpfCnpj": "44.431.351/8233-74",
+    "email": "contato@novaera.com",
+    "telefone": "+1 978-637-5636",
+    "responsavel": "Patrícia Dias",
+    "endereco": "Avenida Nova Era, 407 - Antofagasta, Chile",
+    "pais": "Chile"
+  },
+  {
+    "id": "CLI036",
+    "nome": "Aeroporto Central",
+    "cpfCnpj": "24.082.400/8427-10",
+    "email": "contato@central.com",
+    "telefone": "+1 491-580-8843",
+    "responsavel": "Sérgio Matos",
+    "endereco": "Avenida Central, 707 - Concepción, Chile",
+    "pais": "Chile"
+  },
+  {
+    "id": "CLI037",
+    "nome": "Shopping Beta",
+    "cpfCnpj": "71.167.190/2294-13",
+    "email": "contato@beta.com",
+    "telefone": "+57 771-882-7818",
+    "responsavel": "Camila Alves",
+    "endereco": "Avenida Beta, 1230 - Concepción, Chile",
+    "pais": "Chile"
+  },
+  {
+    "id": "CLI038",
+    "nome": "Tech Park Central",
+    "cpfCnpj": "67.749.649/9091-33",
+    "email": "contato@central.com",
+    "telefone": "+502 876-183-3573",
+    "responsavel": "Fernanda Tavares",
+    "endereco": "Avenida Central, 365 - La Serena, Chile",
+    "pais": "Chile"
+  },
+  {
+    "id": "CLI039",
+    "nome": "Comercial Gamma",
+    "cpfCnpj": "06.797.403/4471-34",
+    "email": "contato@gamma.com",
+    "telefone": "+592 803-777-4241",
+    "responsavel": "Hamilton Siqueira",
+    "endereco": "Avenida Gamma, 245 - Valparaíso, Chile",
+    "pais": "Chile"
+  },
+  {
+    "id": "CLI040",
+    "nome": "Comercial Central",
+    "cpfCnpj": "42.102.499/4717-46",
+    "email": "contato@central.com",
+    "telefone": "+502 712-652-9090",
+    "responsavel": "Sérgio Matos",
+    "endereco": "Avenida Central, 174 - Arequipa, Peru",
+    "pais": "Peru"
+  },
+  {
+    "id": "CLI041",
+    "nome": "Tech Park Beta",
+    "cpfCnpj": "59.401.399/0490-27",
+    "email": "contato@beta.com",
+    "telefone": "+504 867-552-5557",
+    "responsavel": "Luciana Prado",
+    "endereco": "Avenida Beta, 1208 - Cusco, Peru",
+    "pais": "Peru"
+  },
+  {
+    "id": "CLI042",
+    "nome": "Torre Skyline",
+    "cpfCnpj": "75.655.125/6746-80",
+    "email": "contato@skyline.com",
+    "telefone": "+506 290-422-5135",
+    "responsavel": "Paulo Henrique",
+    "endereco": "Avenida Skyline, 247 - Lima, Peru",
+    "pais": "Peru"
+  },
+  {
+    "id": "CLI043",
+    "nome": "Centro Médico Liberdade",
+    "cpfCnpj": "87.603.859/7703-48",
+    "email": "contato@liberdade.com",
+    "telefone": "+56 494-548-8941",
+    "responsavel": "Patrícia Dias",
+    "endereco": "Avenida Liberdade, 69 - Lima, Peru",
+    "pais": "Peru"
+  },
+  {
+    "id": "CLI044",
+    "nome": "Tech Park Central",
+    "cpfCnpj": "48.086.131/7127-48",
+    "email": "contato@central.com",
+    "telefone": "+502 625-954-8905",
+    "responsavel": "Carolina Lopes",
+    "endereco": "Avenida Central, 509 - Arequipa, Peru",
+    "pais": "Peru"
+  },
+  {
+    "id": "CLI045",
+    "nome": "Complexo Oceano",
+    "cpfCnpj": "63.982.146/5840-44",
+    "email": "contato@oceano.com",
+    "telefone": "+1 793-775-9022",
+    "responsavel": "João Carvalho",
+    "endereco": "Avenida Oceano, 924 - Maracaibo, Venezuela",
+    "pais": "Venezuela"
+  },
+  {
+    "id": "CLI046",
+    "nome": "Comercial Skyline",
+    "cpfCnpj": "58.867.533/9636-05",
+    "email": "contato@skyline.com",
+    "telefone": "+507 922-930-7246",
+    "responsavel": "Lívia Melo",
+    "endereco": "Avenida Skyline, 1369 - Valencia, Venezuela",
+    "pais": "Venezuela"
+  },
+  {
+    "id": "CLI047",
+    "nome": "Hotel Skyline",
+    "cpfCnpj": "28.951.718/7026-21",
+    "email": "contato@skyline.com",
+    "telefone": "+507 471-446-7512",
+    "responsavel": "Ricardo Nunes",
+    "endereco": "Avenida Skyline, 682 - Caracas, Venezuela",
+    "pais": "Venezuela"
+  },
+  {
+    "id": "CLI048",
+    "nome": "Comercial Solar",
+    "cpfCnpj": "78.091.343/1611-72",
+    "email": "contato@solar.com",
+    "telefone": "+1 229-147-6314",
+    "responsavel": "Ana Pereira",
+    "endereco": "Avenida Solar, 610 - Valencia, Venezuela",
+    "pais": "Venezuela"
+  },
+  {
+    "id": "CLI049",
+    "nome": "Parque Nova Era",
+    "cpfCnpj": "23.869.222/1969-37",
+    "email": "contato@novaera.com",
+    "telefone": "+1 346-337-8555",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Nova Era, 951 - Manta, Equador",
+    "pais": "Equador"
+  },
+  {
+    "id": "CLI050",
+    "nome": "Faculdade Alpha",
+    "cpfCnpj": "48.217.594/6474-36",
+    "email": "contato@alpha.com",
+    "telefone": "+507 309-342-7248",
+    "responsavel": "Marcelo Freire",
+    "endereco": "Avenida Alpha, 745 - Manta, Equador",
+    "pais": "Equador"
+  },
+  {
+    "id": "CLI051",
+    "nome": "Logística Real",
+    "cpfCnpj": "06.409.097/4395-33",
+    "email": "contato@real.com",
+    "telefone": "+501 456-794-3240",
+    "responsavel": "Patrícia Dias",
+    "endereco": "Avenida Real, 1295 - Cuenca, Equador",
+    "pais": "Equador"
+  },
+  {
+    "id": "CLI052",
+    "nome": "Residencial Real",
+    "cpfCnpj": "09.521.456/2328-58",
+    "email": "contato@real.com",
+    "telefone": "+504 479-950-3695",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Real, 996 - Manta, Equador",
+    "pais": "Equador"
+  },
+  {
+    "id": "CLI053",
+    "nome": "Aeroporto Prime",
+    "cpfCnpj": "71.236.851/6048-17",
+    "email": "contato@prime.com",
+    "telefone": "+598 888-866-5295",
+    "responsavel": "Marcelo Freire",
+    "endereco": "Avenida Prime, 790 - Ciudad de Guatemala, Guatemala",
+    "pais": "Guatemala"
+  },
+  {
+    "id": "CLI054",
+    "nome": "Parque Delta",
+    "cpfCnpj": "70.985.931/7461-20",
+    "email": "contato@delta.com",
+    "telefone": "+52 511-604-2902",
+    "responsavel": "Patrícia Dias",
+    "endereco": "Avenida Delta, 490 - Quetzaltenango, Guatemala",
+    "pais": "Guatemala"
+  },
+  {
+    "id": "CLI055",
+    "nome": "Comercial Omega",
+    "cpfCnpj": "75.869.261/7964-05",
+    "email": "contato@omega.com",
+    "telefone": "+58 654-555-4868",
+    "responsavel": "Beatriz Franco",
+    "endereco": "Avenida Omega, 213 - Mixco, Guatemala",
+    "pais": "Guatemala"
+  },
+  {
+    "id": "CLI056",
+    "nome": "Parque Oceano",
+    "cpfCnpj": "06.431.713/9005-32",
+    "email": "contato@oceano.com",
+    "telefone": "+1 410-170-4394",
+    "responsavel": "Marcelo Freire",
+    "endereco": "Avenida Oceano, 452 - Escuintla, Guatemala",
+    "pais": "Guatemala"
+  },
+  {
+    "id": "CLI057",
+    "nome": "Empreendimentos Prime",
+    "cpfCnpj": "90.422.842/1020-53",
+    "email": "contato@prime.com",
+    "telefone": "+1 531-116-3854",
+    "responsavel": "Roberto Vieira",
+    "endereco": "Avenida Prime, 117 - Santo Domingo, República Dominicana",
+    "pais": "República Dominicana"
+  },
+  {
+    "id": "CLI058",
+    "nome": "Hotel Estação",
+    "cpfCnpj": "11.775.891/7839-08",
+    "email": "contato@estação.com",
+    "telefone": "+1 669-758-1510",
+    "responsavel": "Ana Pereira",
+    "endereco": "Avenida Estação, 990 - La Romana, República Dominicana",
+    "pais": "República Dominicana"
+  },
+  {
+    "id": "CLI059",
+    "nome": "Centro Médico Estação",
+    "cpfCnpj": "17.711.592/1249-98",
+    "email": "contato@estação.com",
+    "telefone": "+53 590-711-9692",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Estação, 939 - La Romana, República Dominicana",
+    "pais": "República Dominicana"
+  },
+  {
+    "id": "CLI060",
+    "nome": "Escritório Summit",
+    "cpfCnpj": "11.836.736/5766-15",
+    "email": "contato@summit.com",
+    "telefone": "+591 520-781-5176",
+    "responsavel": "Beatriz Franco",
+    "endereco": "Avenida Summit, 322 - Santiago de Cuba, Cuba",
+    "pais": "Cuba"
+  },
+  {
+    "id": "CLI061",
+    "nome": "Colégio Gamma",
+    "cpfCnpj": "11.615.280/9885-16",
+    "email": "contato@gamma.com",
+    "telefone": "+598 881-868-7929",
+    "responsavel": "Ana Pereira",
+    "endereco": "Avenida Gamma, 599 - La Habana, Cuba",
+    "pais": "Cuba"
+  },
+  {
+    "id": "CLI062",
+    "nome": "Tech Park Real",
+    "cpfCnpj": "19.832.731/5851-49",
+    "email": "contato@real.com",
+    "telefone": "+593 639-965-1430",
+    "responsavel": "Camila Alves",
+    "endereco": "Avenida Real, 1357 - Santiago de Cuba, Cuba",
+    "pais": "Cuba"
+  },
+  {
+    "id": "CLI063",
+    "nome": "Faculdade Alpha",
+    "cpfCnpj": "44.550.229/6120-18",
+    "email": "contato@alpha.com",
+    "telefone": "+58 585-529-8432",
+    "responsavel": "Paulo Henrique",
+    "endereco": "Avenida Alpha, 332 - Montevidéu, Uruguai",
+    "pais": "Uruguai"
+  },
+  {
+    "id": "CLI064",
+    "nome": "Parque Real",
+    "cpfCnpj": "59.910.229/0147-67",
+    "email": "contato@real.com",
+    "telefone": "+501 652-524-5475",
+    "responsavel": "Gustavo Lima",
+    "endereco": "Avenida Real, 1059 - Salto, Uruguai",
+    "pais": "Uruguai"
+  },
+  {
+    "id": "CLI065",
+    "nome": "Hospital Nova Era",
+    "cpfCnpj": "14.978.403/6900-34",
+    "email": "contato@novaera.com",
+    "telefone": "+58 985-240-5186",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Nova Era, 681 - Punta del Este, Uruguai",
+    "pais": "Uruguai"
+  },
+  {
+    "id": "CLI066",
+    "nome": "Hospital Alpha",
+    "cpfCnpj": "62.268.388/5160-60",
+    "email": "contato@alpha.com",
+    "telefone": "+506 279-982-6129",
+    "responsavel": "Marcelo Freire",
+    "endereco": "Avenida Alpha, 889 - Ciudad del Este, Paraguai",
+    "pais": "Paraguai"
+  },
+  {
+    "id": "CLI067",
+    "nome": "Logística Solar",
+    "cpfCnpj": "64.160.529/7516-13",
+    "email": "contato@solar.com",
+    "telefone": "+591 803-510-9584",
+    "responsavel": "Ricardo Nunes",
+    "endereco": "Avenida Solar, 820 - Encarnación, Paraguai",
+    "pais": "Paraguai"
+  },
+  {
+    "id": "CLI068",
+    "nome": "Aeroporto Prime",
+    "cpfCnpj": "52.181.883/5523-12",
+    "email": "contato@prime.com",
+    "telefone": "+502 402-277-3504",
+    "responsavel": "Ricardo Nunes",
+    "endereco": "Avenida Prime, 372 - Asunción, Paraguai",
+    "pais": "Paraguai"
+  },
+  {
+    "id": "CLI069",
+    "nome": "Colégio Mirage",
+    "cpfCnpj": "97.995.527/1774-49",
+    "email": "contato@mirage.com",
+    "telefone": "+52 560-619-2215",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Mirage, 955 - Cochabamba, Bolívia",
+    "pais": "Bolívia"
+  },
+  {
+    "id": "CLI070",
+    "nome": "Complexo Beta",
+    "cpfCnpj": "54.119.986/7980-79",
+    "email": "contato@beta.com",
+    "telefone": "+592 392-429-8792",
+    "responsavel": "Rafael Cunha",
+    "endereco": "Avenida Beta, 318 - La Paz, Bolívia",
+    "pais": "Bolívia"
+  },
+  {
+    "id": "CLI071",
+    "nome": "Residencial Mirage",
+    "cpfCnpj": "51.820.377/8892-55",
+    "email": "contato@mirage.com",
+    "telefone": "+1 596-518-6543",
+    "responsavel": "Camila Alves",
+    "endereco": "Avenida Mirage, 117 - La Paz, Bolívia",
+    "pais": "Bolívia"
+  },
+  {
+    "id": "CLI072",
+    "nome": "Universidade Gamma",
+    "cpfCnpj": "18.644.925/1925-46",
+    "email": "contato@gamma.com",
+    "telefone": "+56 809-825-2388",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Gamma, 1154 - Alajuela, Costa Rica",
+    "pais": "Costa Rica"
+  },
+  {
+    "id": "CLI073",
+    "nome": "Centro Médico Prime",
+    "cpfCnpj": "81.685.054/2357-33",
+    "email": "contato@prime.com",
+    "telefone": "+56 358-179-5846",
+    "responsavel": "Patrícia Dias",
+    "endereco": "Avenida Prime, 1049 - San José, Costa Rica",
+    "pais": "Costa Rica"
+  },
+  {
+    "id": "CLI074",
+    "nome": "Comercial Liberdade",
+    "cpfCnpj": "59.296.222/9270-65",
+    "email": "contato@liberdade.com",
+    "telefone": "+597 936-343-8277",
+    "responsavel": "Camila Alves",
+    "endereco": "Avenida Liberdade, 593 - San José, Costa Rica",
+    "pais": "Costa Rica"
+  },
+  {
+    "id": "CLI075",
+    "nome": "Complexo Central",
+    "cpfCnpj": "34.735.977/4688-62",
+    "email": "contato@central.com",
+    "telefone": "+58 819-241-5096",
+    "responsavel": "Ana Pereira",
+    "endereco": "Avenida Central, 1323 - David, Panamá",
+    "pais": "Panamá"
+  },
+  {
+    "id": "CLI076",
+    "nome": "Colégio Nova Era",
+    "cpfCnpj": "18.141.247/8261-37",
+    "email": "contato@novaera.com",
+    "telefone": "+598 227-524-1872",
+    "responsavel": "Lívia Melo",
+    "endereco": "Avenida Nova Era, 1038 - David, Panamá",
+    "pais": "Panamá"
+  },
+  {
+    "id": "CLI077",
+    "nome": "Parque Central",
+    "cpfCnpj": "15.305.152/2047-27",
+    "email": "contato@central.com",
+    "telefone": "+506 830-105-2298",
+    "responsavel": "Marcos Silva",
+    "endereco": "Avenida Central, 534 - Colón, Panamá",
+    "pais": "Panamá"
+  },
+  {
+    "id": "CLI078",
+    "nome": "Condomínio Omega",
+    "cpfCnpj": "98.614.341/0369-71",
+    "email": "contato@omega.com",
+    "telefone": "+57 711-711-9782",
+    "responsavel": "Marcos Silva",
+    "endereco": "Avenida Omega, 1304 - La Ceiba, Honduras",
+    "pais": "Honduras"
+  },
+  {
+    "id": "CLI079",
+    "nome": "Escritório Vale",
+    "cpfCnpj": "24.609.539/6218-51",
+    "email": "contato@vale.com",
+    "telefone": "+504 757-619-9316",
+    "responsavel": "Aline Moreira",
+    "endereco": "Avenida Vale, 51 - Tegucigalpa, Honduras",
+    "pais": "Honduras"
+  },
+  {
+    "id": "CLI080",
+    "nome": "Centro Médico Skyline",
+    "cpfCnpj": "65.405.153/1952-05",
+    "email": "contato@skyline.com",
+    "telefone": "+505 546-933-3868",
+    "responsavel": "Sérgio Matos",
+    "endereco": "Avenida Skyline, 1434 - Tegucigalpa, Honduras",
+    "pais": "Honduras"
+  },
+  {
+    "id": "CLI081",
+    "nome": "Colégio Aurora",
+    "cpfCnpj": "17.043.030/5486-87",
+    "email": "contato@aurora.com",
+    "telefone": "+502 237-871-4131",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Aurora, 741 - Managua, Nicarágua",
+    "pais": "Nicarágua"
+  },
+  {
+    "id": "CLI082",
+    "nome": "Residencial Prime",
+    "cpfCnpj": "15.667.652/7758-41",
+    "email": "contato@prime.com",
+    "telefone": "+591 280-540-3956",
+    "responsavel": "Aline Moreira",
+    "endereco": "Avenida Prime, 611 - León, Nicarágua",
+    "pais": "Nicarágua"
+  },
+  {
+    "id": "CLI083",
+    "nome": "Universidade Delta",
+    "cpfCnpj": "54.479.627/5705-96",
+    "email": "contato@delta.com",
+    "telefone": "+502 854-910-1939",
+    "responsavel": "Ricardo Nunes",
+    "endereco": "Avenida Delta, 1384 - Managua, Nicarágua",
+    "pais": "Nicarágua"
+  },
+  {
+    "id": "CLI084",
+    "nome": "Centro Médico Nova Era",
+    "cpfCnpj": "20.297.021/3556-90",
+    "email": "contato@novaera.com",
+    "telefone": "+501 357-795-8371",
+    "responsavel": "Beatriz Franco",
+    "endereco": "Avenida Nova Era, 771 - Bayamón, Porto Rico",
+    "pais": "Porto Rico"
+  },
+  {
+    "id": "CLI085",
+    "nome": "Complexo Gamma",
+    "cpfCnpj": "28.565.431/0278-68",
+    "email": "contato@gamma.com",
+    "telefone": "+57 468-893-5264",
+    "responsavel": "Sérgio Matos",
+    "endereco": "Avenida Gamma, 449 - Bayamón, Porto Rico",
+    "pais": "Porto Rico"
+  },
+  {
+    "id": "CLI086",
+    "nome": "Tech Park Real",
+    "cpfCnpj": "73.121.727/1551-88",
+    "email": "contato@real.com",
+    "telefone": "+1 507-971-3580",
+    "responsavel": "Luciana Prado",
+    "endereco": "Avenida Real, 750 - Bayamón, Porto Rico",
+    "pais": "Porto Rico"
+  },
+  {
+    "id": "CLI087",
+    "nome": "Escritório Central",
+    "cpfCnpj": "32.370.589/5782-91",
+    "email": "contato@central.com",
+    "telefone": "+54 516-507-8842",
+    "responsavel": "Rafael Cunha",
+    "endereco": "Avenida Central, 851 - Belize City, Belize",
+    "pais": "Belize"
+  },
+  {
+    "id": "CLI088",
+    "nome": "Torre Vale",
+    "cpfCnpj": "25.177.852/8922-68",
+    "email": "contato@vale.com",
+    "telefone": "+52 327-630-3507",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Vale, 347 - Belize City, Belize",
+    "pais": "Belize"
+  },
+  {
+    "id": "CLI089",
+    "nome": "Shopping Prime",
+    "cpfCnpj": "35.841.438/4249-81",
+    "email": "contato@prime.com",
+    "telefone": "+504 856-272-3526",
+    "responsavel": "Luciana Prado",
+    "endereco": "Avenida Prime, 1359 - San Ignacio, Belize",
+    "pais": "Belize"
+  },
+  {
+    "id": "CLI090",
+    "nome": "Tech Park Summit",
+    "cpfCnpj": "90.010.943/9690-78",
+    "email": "contato@summit.com",
+    "telefone": "+1 857-409-8912",
+    "responsavel": "Fernanda Tavares",
+    "endereco": "Avenida Summit, 1412 - Linden, Guiana",
+    "pais": "Guiana"
+  },
+  {
+    "id": "CLI091",
+    "nome": "Centro Médico Real",
+    "cpfCnpj": "10.276.773/5925-55",
+    "email": "contato@real.com",
+    "telefone": "+595 333-878-7070",
+    "responsavel": "Rafael Cunha",
+    "endereco": "Avenida Real, 1160 - Linden, Guiana",
+    "pais": "Guiana"
+  },
+  {
+    "id": "CLI092",
+    "nome": "Hospital Prime",
+    "cpfCnpj": "71.473.210/4696-32",
+    "email": "contato@prime.com",
+    "telefone": "+53 791-838-6123",
+    "responsavel": "Gustavo Lima",
+    "endereco": "Avenida Prime, 336 - Georgetown, Guiana",
+    "pais": "Guiana"
+  },
+  {
+    "id": "CLI093",
+    "nome": "Colégio Liberdade",
+    "cpfCnpj": "74.701.687/3395-00",
+    "email": "contato@liberdade.com",
+    "telefone": "+1 706-711-8710",
+    "responsavel": "Marta Rangel",
+    "endereco": "Avenida Liberdade, 1109 - Lelydorp, Suriname",
+    "pais": "Suriname"
+  },
+  {
+    "id": "CLI094",
+    "nome": "Construtora Delta",
+    "cpfCnpj": "24.565.060/9835-84",
+    "email": "contato@delta.com",
+    "telefone": "+54 595-616-8378",
+    "responsavel": "Aline Moreira",
+    "endereco": "Avenida Delta, 582 - Lelydorp, Suriname",
+    "pais": "Suriname"
+  },
+  {
+    "id": "CLI095",
+    "nome": "Tech Park Summit",
+    "cpfCnpj": "21.655.852/3986-80",
+    "email": "contato@summit.com",
+    "telefone": "+52 239-240-6456",
+    "responsavel": "Carolina Lopes",
+    "endereco": "Avenida Summit, 1073 - Paramaribo, Suriname",
+    "pais": "Suriname"
   }
 ]

@@ -1,6 +1,6 @@
 /**
  * BarChart em SVG puro (sem libs) para manter fácil de manter.
- * props: data = [{mes, valor}], max (opcional)
+ * props: data = [{mes, valor}] OU [{label, value}], max (opcional)
  */
 export default function BarChart({ data = [], height = 260, max }) {
   const pad = 28;
@@ -9,18 +9,24 @@ export default function BarChart({ data = [], height = 260, max }) {
   const innerW = w - pad * 2;
   const innerH = h - pad * 2;
 
-  const maxVal = max ?? Math.max(...data.map((d) => d.valor), 1);
-  const stepX = innerW / data.length;
+  // aceita ambos formatos
+  const getVal = (d) => Number(d?.valor ?? d?.value ?? 0);
+  const getLbl = (d) => String(d?.mes ?? d?.label ?? "");
+  const n = Array.isArray(data) ? data.length : 0;
+
+  // evita NaN/Infinity quando não há dados
+  const maxVal = Math.max(max ?? Math.max(...(n ? data.map(getVal) : [0])), 1);
+  const stepX = n ? innerW / n : innerW;
 
   return (
     <svg
       viewBox={`0 0 ${w} ${h}`}
       width="100%"
       height={h}
-      preserveAspectRatio="xMidYMid meet" // <— garante encaixe
-      style={{ display: "block" }} // <— evita 1px extra
+      preserveAspectRatio="xMidYMid meet"
+      style={{ display: "block" }}
     >
-      {/* eixo y tracejado */}
+      {/* linhas guia no eixo Y */}
       {[0, 0.25, 0.5, 0.75, 1].map((p, i) => (
         <line
           key={i}
@@ -37,7 +43,8 @@ export default function BarChart({ data = [], height = 260, max }) {
       {data.map((d, i) => {
         const barW = stepX * 0.5;
         const x = pad + stepX * i + (stepX - barW) / 2;
-        const bh = (d.valor / maxVal) * innerH;
+        const v = getVal(d);
+        const bh = (v / maxVal) * innerH;
         const y = pad + innerH - bh;
         return (
           <g key={i}>
@@ -49,12 +56,13 @@ export default function BarChart({ data = [], height = 260, max }) {
               fontSize="12"
               fill="#6b7280"
             >
-              {d.mes}
+              {getLbl(d)}
             </text>
           </g>
         );
       })}
-      {/* eixo y 0 */}
+
+      {/* eixos */}
       <line
         x1={pad}
         x2={w - pad}

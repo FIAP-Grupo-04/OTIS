@@ -1,7 +1,7 @@
 .form-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 .field {
@@ -72,4 +72,44 @@
 .error {
   font-size: 0.8rem;
   color: #dc2626;
+}
+
+/* Textarea com tamanho fixo, sem “grip” de redimensionar */
+.input-textarea {
+  resize: none;
+  min-height: 96px; /* 4 linhas */
+  max-height: 96px;
+}
+
+/* contador simples abaixo do textarea */
+.char-counter {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: right;
+}
+
+/* se seu modal já usa .form-grid, ótimo; senão, pode aplicar nessa classe que envolve os Fields */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* duas colunas */
+  gap: 12px;
+}
+
+/* utilitária para ocupar as duas colunas */
+.col-span-2 {
+  grid-column: 1 / -1; /* ocupa de 1 até o fim */
+}
+
+/* textarea fixo + sem redimensionar (já usamos antes) */
+.input-textarea {
+  resize: none;
+  min-height: 96px;
+  max-height: 96px;
+}
+.char-counter {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: right;
 }
