@@ -497,7 +497,7 @@ export default function Operations() {
         </form>
       </Section>
 
-      <Section title="Operações" subtitle="Seed + alterações locais.">
+      <Section title="Operações" subtitle="Filtros da tabela">
         <div
           style={{
             display: "flex",
